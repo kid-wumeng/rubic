@@ -46,9 +46,6 @@ arr.push(Comic)
 arr.push(Author)
 arr.push(Job)
 
-dict = SchemaFactory.createCompleteSchemaDict(arr)
-dict = SchemaFactory.createLinearSchemaDict(dict)
-DataFilter.filter(dict['Job'], {name: '0'})
 
 
 co = require('co')
@@ -58,7 +55,12 @@ $ = require('./src/Core')
 co(->
   yield Runtime.start()
 
-  console.log yield $.table('People').find()
+  people = yield $.table('People')
+    .page(2).size(2)
+    .omit('id')
+    .findAll()
+
+  console.log people
 
 ).catch((e)->
   console.log e

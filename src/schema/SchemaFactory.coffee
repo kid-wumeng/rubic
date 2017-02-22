@@ -7,7 +7,8 @@ class SchemaFactory
 
 
 
-SchemaFactory.createLinearSchemaDict = (completeSchemaDict) ->
+SchemaFactory.createLinearSchemaDict = (schemas) ->
+  completeSchemaDict = @createCompleteSchemaDict(schemas)
   linearSchemaDict = {}
   for name, completeSchema of completeSchemaDict
     linearSchemaDict[name] = @createLinearSchema(completeSchema)

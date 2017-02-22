@@ -14,7 +14,14 @@ Runtime.start = () ->
     database:
       name: 'test'
   Store.database = yield DB.connect()
-  
+
+  People =
+    $name: 'People'
+
+  schemas = [People]
+
+  Store.schemaDict = SchemaFactory.createLinearSchemaDict(schemas)
+
 
 
 

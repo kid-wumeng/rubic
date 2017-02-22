@@ -22,9 +22,54 @@ DB.connect = (config) ->
 
 
 
+DB.formatQueryDocument = (query) ->
+  doc = {}
+  for key, value of query.whenDict
+    _.set(doc, key, value)
+  return doc
+
+
+
+DB.formatQueryOption = (query) ->
+  sort = query.valueSort
+  page = query.valuePage
+  size = query.valueSize
+  op = {}
+  op.sort = {id: sort}
+  op.skip = (page-1) * size
+  op.limit = size
+  op.fields = @formatQueryOptionFields(query)
+  return op
+
+
+
+DB.formatQueryOptionFields = (query) ->
+  fields = {}
+  # 挑选字段
+  if query.usePick is true
+    query.pickSet.forEach (value, key) ->
+      fields[key] = 1
+    fields['id'] = 1  # 默认包含id
+  # 排除字段
+  if query.usePick is false
+    query.omitSet.forEach (value, key) ->
+      fields[key] = -1
+  return fields
+
+
+
 DB.find = (query) ->
+  doc = @formatQueryDocument(query)
+  op = @formatQueryOption(query)
+  return Store.database.collection(table).findOne(doc, op)
+
+
+
+DB.findAll = (query) ->
   {table, schema} = query
-  return Store.database.collection(table).findOne()
+  doc = @formatQueryDocument(query)
+  op = @formatQueryOption(query)
+  return Store.database.collection(table).find(doc, op).toArray()
 
 
 
