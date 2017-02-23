@@ -11,26 +11,24 @@ class Query
 
 ###
   例子：
-  whenDict = {
+  dictWhere = {
     'name': 'kid'
     'pet.age':
       $min: 3
       $max: 8
   }
 ###
-Query.prototype.whenDict = {}
+Query.prototype.dictWhere = {}
 
 
 
-# 根据id排序，1是正序，-1是逆序
-Query.prototype.valueSort = 1
-
-
-
-# 为了使用方便，第一页是1而不是0
-Query.prototype.valuePage = 1
-# 0表示无限制
-Query.prototype.valueSize = 0
+Query.prototype.option =
+  # 根据_id排序，1是正序，-1是逆序
+  sort: 1
+  # 为了使用方便，第一页是1而不是0
+  page: 1
+  # 0表示无限制
+  size: 0
 
 
 # 由于pick与omit是互斥的（不能同时存在），所以设此标志位
@@ -45,39 +43,39 @@ Query.prototype.omitSet = new Set()
 
 
 # 当前when对应的key，是个临时属性，仅用于收集条件
-Query.prototype.whenKey = {}
+Query.prototype.key = {}
 
 
 
 Query.prototype.when = (key) ->
-  @whenKey = key
+  @key = key
   return @
 
 
 
 Query.prototype.is = (value) ->
-  _.set(@whenDict, @whenKey, value)
+  _.set(@doc, @key, value)
   return @
 
 
 
-Query.prototype.sort = (valueSort) ->
+Query.prototype.sort = (sort) ->
   # @TODO 值检查
-  @valueSort = valueSort
+  @option.sort = sort
   return @
 
 
 
-Query.prototype.page = (valuePage) ->
+Query.prototype.page = (page) ->
   # @TODO 值检查
-  @valuePage = valuePage
+  @option.page = page
   return @
 
 
 
 Query.prototype.size = (valueSize) ->
   # @TODO 值检查
-  @valueSize = valueSize
+  @option.size = valueSize
   return @
 
 

@@ -1,6 +1,5 @@
 _ = require('lodash')
 MongoClient = require('mongodb').MongoClient
-Store = require('../Store')
 Error = require('../Error')
 
 
@@ -9,16 +8,20 @@ class DB
 
 
 
-DB.connect = (config) ->
-  name = Store.config.database.name
-  user = Store.config.database.user
-  pass = Store.config.database.pass
-  host = Store.config.database.host ? '127.0.0.1'
-  port = Store.config.database.port ? 27017
+DB.database = null
+
+
+
+DB.connect = (op) ->
+  name = op.name
+  user = op.user
+  pass = op.pass
+  host = op.host ? '127.0.0.1'
+  port = op.port ? 27017
   auth = if user then "#{user}:#{pass}@" else ''
   # https://docs.mongodb.com/manual/reference/connection-string/
   url = "mongodb://#{auth}#{host}:#{port}/#{name}"
-  return yield MongoClient.connect(url)
+  @database = yield MongoClient.connect(url)
 
 
 
@@ -61,7 +64,7 @@ DB.formatQueryOptionFields = (query) ->
 DB.find = (query) ->
   doc = @formatQueryDocument(query)
   op = @formatQueryOption(query)
-  return Store.database.collection(table).findOne(doc, op)
+  return @database.collection(table).findOne(doc, op)
 
 
 
@@ -69,7 +72,7 @@ DB.findAll = (query) ->
   {table, schema} = query
   doc = @formatQueryDocument(query)
   op = @formatQueryOption(query)
-  return Store.database.collection(table).find(doc, op).toArray()
+  return @database.collection(table).find(doc, op).toArray()
 
 
 

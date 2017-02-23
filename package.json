@@ -7,6 +7,7 @@
     "deep-assign": "^2.0.0",
     "deep-keys": "^0.4.0",
     "lodash": "^4.17.4",
-    "mongodb": "^2.2.24"
+    "mongodb": "^2.2.24",
+    "object-end-keys": "^3.0.0"
   }
 }
