@@ -46,6 +46,9 @@ class SchemaFormater
 
 
 
+###
+@PUBLIC
+###
 SchemaFormater.format = (schema={}) ->
   newSchema = {}
   cursor = []

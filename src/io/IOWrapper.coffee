@@ -9,8 +9,6 @@ IOWrapper.wrap = (ioDefine={}, ctx={}) ->
   @formatSchema(ioDefine)
   return (data={}) ->
     data = DataFormater.format(data, ioDefine.inSchema)
-    console.log data.d
-
     ctx = Object.assign({}, ctx)
     ctx.data = data
     ioDefine.io.call(ctx)

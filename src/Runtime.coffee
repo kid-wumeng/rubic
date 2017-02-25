@@ -41,8 +41,6 @@ Runtime.start = () ->
   core.io = {}
   @readyIO(ioDefines, core)
   core.io.bbb({
-    name: 'kid'
-    d: [14, {e: 88}]
   })
 
 
