@@ -8,7 +8,7 @@ class IOWrapper
 IOWrapper.wrap = (ioDefine={}, ctx={}) ->
   @formatSchema(ioDefine)
   return (data={}) ->
-    data = DataFormater.format(data, ioDefine.inSchema)
+    data = DataFormater.formatLinear(data, ioDefine.inSchema)
     ctx = Object.assign({}, ctx)
     ctx.data = data
     ioDefine.io.call(ctx)

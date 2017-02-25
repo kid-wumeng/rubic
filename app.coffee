@@ -1,5 +1,6 @@
 co = require('co')
 Runtime = require('./src/Runtime')
+SchemaFormater = require('./src/io/SchemaFormater')
 SchemaSplicer = require('./src/io/SchemaSplicer')
 
 
@@ -39,8 +40,8 @@ co(->
 
 
   Job = {
-    salary:
-      $type: Number
+    $salary: Number
+    contents: ['Sktring']
   }
 
   baseSchemaDict =
@@ -51,8 +52,9 @@ co(->
     Thing: Thing
 
 
-  newDict = SchemaSplicer.spliceDict(baseSchemaDict)
-  console.log newDict
+  SchemaFormater.formatLogogram(Job)
+  console.log Job
+
 
 ).catch((e)->
   console.log e

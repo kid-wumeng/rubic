@@ -49,7 +49,7 @@ class SchemaFormater
 ###
 @PUBLIC
 ###
-SchemaFormater.format = (schema={}) ->
+SchemaFormater.formatLinear = (schema={}) ->
   newSchema = {}
   cursor = []
   @traversal(schema, newSchema, cursor)
@@ -74,9 +74,31 @@ SchemaFormater.traversal = (node, newSchema, cursor) ->
     if Array.isArray(node)
       newSchema[cursor.join('.')] =
         $type: Array
-        $schema: if node[0].$type then node[0] else @format(node[0])
+        $schema: if node[0].$type then node[0] else @formatLinear(node[0])
   # 无论是哪种节点，处理完毕后都要返回上一层
   cursor.pop()
+
+
+
+SchemaFormater.formatLogogram = (node) ->
+  if _.isPlainObject(node)
+    for name, child of node
+      if name[0] is '$'
+        continue
+      node[name] = @formatLogogramEach(child)
+  else if Array.isArray(node)
+    node[0] = @formatLogogramEach(node[0])
+  return node
+
+
+
+SchemaFormater.formatLogogramEach = (value) ->
+  if [Boolean, Number, String, Buffer, Date].includes(value)
+    return {$type: value}
+  else if typeof(value) is 'string'
+    return {$ref: value}
+  else
+    return @formatLogogram(value)
 
 
 

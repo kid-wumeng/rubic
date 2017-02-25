@@ -32,7 +32,6 @@ SchemaSplicer.splice = (node, schemaDict) ->
 ###
 SchemaSplicer.spliceDict = (dict) ->
   for name, schema of dict
-    # @TODO 处理简写
     dict[name] = @splice(schema, dict)
   return dict
 
