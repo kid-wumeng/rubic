@@ -48,12 +48,10 @@ co(->
     Subject: Subject
     Author: Author
     Job: Job
-    Comic: Comic
-    Thing: Thing
 
 
-  SchemaFormater.formatLogogram(Job)
-  console.log Job
+  nc = SchemaSplicer.splice(Comic, baseSchemaDict)
+  console.log nc
 
 
 ).catch((e)->
