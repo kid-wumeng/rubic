@@ -11,6 +11,9 @@ class SchemaSplicer
 用于接合IO模式
 ###
 SchemaSplicer.splice = (node, schemaDict) ->
+  if Array.isArray(node)
+    first = @splice(node[0], schemaDict)
+    return [first]
   if !_.isPlainObject(node)
     return node
   # 接合本节点$ref，参考的模式可能也有$ref，所以进行继承式接合

@@ -8,23 +8,28 @@ class SchemaManager
 
 
 
-SchemaManager.dict = (schema) ->
+SchemaManager.dict = null
 
 
 
-SchemaManager.add = (schema) ->
-  name = schema.$name
-  # @TODO 检查是否重复
-  @dict[name] = schema
+SchemaManager.save = (schemaDict) ->
+  @dict = schemaDict
 
 
 
-SchemaManager.format = () ->
+SchemaManager.formatBaseSchemaDict = () ->
   for name, schema of @dict
     SchemaFormater.formatLogogram(schema)
   @dict = SchemaSplicer.spliceDict(@dict)
   for name, schema of @dict
     @dict[name] = SchemaFormater.formatLinear(schema)
+
+
+
+SchemaManager.formatIOSchema = (schema) ->
+  SchemaFormater.formatLogogram(schema)
+  schema = SchemaSplicer.splice(schema, @dict)
+  return SchemaFormater.formatLinear(schema)
 
 
 

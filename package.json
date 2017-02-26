@@ -3,11 +3,12 @@
   "version": "0.1.0",
   "dependencies": {
     "co": "^4.6.0",
-    "coffee-script": "^1.12.4",
+    "coffeescript": "^2.0.0-alpha1",
     "deep-assign": "^2.0.0",
     "deep-keys": "^0.4.0",
     "lodash": "^4.17.4",
     "mongodb": "^2.2.24",
-    "object-end-keys": "^3.0.0"
+    "object-end-keys": "^3.0.0",
+    "require-dir": "^0.3.1"
   }
 }

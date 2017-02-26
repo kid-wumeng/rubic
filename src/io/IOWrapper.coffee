@@ -1,24 +1,25 @@
-SchemaFormater = require('./SchemaFormater')
+SchemaManager = require('./SchemaManager')
 DataFormater = require('./DataFormater')
+
 
 
 class IOWrapper
 
 
-IOWrapper.wrap = (ioDefine={}, ctx={}) ->
+
+IOWrapper.wrap = (ioDefine={}, dictIO) ->
   @formatSchema(ioDefine)
+  ctx = {}
+  ctx.io = dictIO
   return (data={}) ->
     data = DataFormater.format(data, ioDefine.inSchema)
-    ctx = Object.assign({}, ctx)
-    ctx.data = data
-    ioDefine.io.call(ctx)
+    ioDefine.io.call(ctx, data)
 
 
 
 IOWrapper.formatSchema = (ioDefine) ->
-  ioDefine.inSchema = SchemaFormater.formatLinear(ioDefine.inSchema)
-  ioDefine.outSchema = SchemaFormater.formatLinear(ioDefine.outSchema)
-
+  ioDefine.inSchema = SchemaManager.formatIOSchema(ioDefine.inSchema)
+  ioDefine.outSchema = SchemaManager.formatIOSchema(ioDefine.outSchema)
 
 
 
