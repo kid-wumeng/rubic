@@ -1,3 +1,4 @@
+Error = require('../Error')
 IOManager = require('./IOManager')
 
 
@@ -12,8 +13,7 @@ IOCaller.call = (name, data) ->
     io = IOManager.dictIO[name]
     return await io(data)
   else
-    # @TODO Error
-    throw '无此API'
+    throw new Error.IO_NOT_FOUND({ioName: name})
 
 
 

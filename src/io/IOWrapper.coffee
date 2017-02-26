@@ -1,5 +1,6 @@
 SchemaManager = require('./SchemaManager')
 DataFormater = require('./DataFormater')
+DataChecker = require('./DataChecker')
 
 
 
@@ -9,17 +10,23 @@ class IOWrapper
 
 IOWrapper.wrap = (ioDefine={}, dictIO) ->
   @formatSchema(ioDefine)
+  {iSchema, oSchema, io} = ioDefine
+
   ctx = {}
   ctx.io = dictIO
-  return (data={}) ->
-    data = DataFormater.format(data, ioDefine.inSchema)
-    ioDefine.io.call(ctx, data)
+
+  return (inData={}) ->
+    inData = DataFormater.format(inData, iSchema)
+    DataChecker.check(inData, iSchema)
+    outData = await io.call(ctx, inData)
+    outData = DataFormater.format(outData, oSchema)
+    return outData
 
 
 
 IOWrapper.formatSchema = (ioDefine) ->
-  ioDefine.inSchema = SchemaManager.formatIOSchema(ioDefine.inSchema)
-  ioDefine.outSchema = SchemaManager.formatIOSchema(ioDefine.outSchema)
+  ioDefine.iSchema = SchemaManager.formatIOSchema(ioDefine.iSchema)
+  ioDefine.oSchema = SchemaManager.formatIOSchema(ioDefine.oSchema)
 
 
 

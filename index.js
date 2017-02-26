@@ -1,2 +1,2 @@
 require('coffeescript/register')
-require('./playground')
+require('./demo')

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Demo</title>
+</head>
+<body>
+
+  <input id="input" type="file" onchange="upload()"/>
+
+  <script>
+
+    ;(function(){
+
+      var _host = null;
+
+      var Core = {};
+
+      Core.host = function(host){
+        if(host[host.length-1] !== '/'){
+          host += '/'
+        }
+        _host = host
+      }
+
+      Core.parse = function(data){
+        var jsonDict = {};
+        var dateDict = {};
+        var fileDict = {};
+        var cursor = [];
+        traversal(data);
+        return {
+          jsonDict: jsonDict,
+          dateDict: dateDict,
+          fileDict: fileDict
+        };
+
+        function traversal(node){
+          var type = typeof(node);
+          if(type === 'boolean' || type === 'number' || type === 'string')
+            jsonDict[cursor.join('.')] = node;
+          else if(node instanceof Date)
+            dateDict[cursor.join('.')] = node;
+          else if(node instanceof File)
+            fileDict[cursor.join('.')] = node;
+          else
+            for(var name in node){
+              cursor.push(name);
+              traversal(node[name]);
+            }
+          cursor.pop();
+        }
+      }
+
+      Core.appendJSON = function(formData, jsonDict){
+        formData.append('$jsonDict', JSON.stringify(jsonDict));
+      }
+
+      Core.appendDate = function(formData, dateDict){
+        for(var key in dateDict){
+          dateDict[key] = dateDict[key].getTime();
+        }
+        formData.append('$dateDict', JSON.stringify(dateDict));
+      }
+
+      Core.appendFile = function(formData, fileDict){
+        for(var key in fileDict){
+          formData.append(key, fileDict[key]);
+        }
+      }
+
+      Core.call = function(ioName, data){
+        var formData = new FormData();
+        data = Core.parse(data);
+        Core.appendJSON(formData, data.jsonDict);
+        Core.appendDate(formData, data.dateDict);
+        Core.appendFile(formData, data.fileDict);
+
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', _host);
+        xhr.send(formData);
+      }
+
+      window.Rubic = Core;
+
+    })();
+
+
+    Rubic.host('http://localhost:3000');
+
+    function upload(){
+      var file = document.getElementById('input').files[0]
+      Rubic.call('findBook', {
+        name: '哈利波特',
+        author: {
+          name: '罗琳',
+          age: 18
+        },
+        face: file,
+        createDate: new Date()
+      });
+    }
+
+  </script>
+
+</body>
+</html>

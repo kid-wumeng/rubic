@@ -8,7 +8,6 @@ class IOManager
 
 IOManager.dictIODefine = null
 IOManager.dictIO = null
-IOManager.dictIOPublic = null
 
 
 
@@ -27,11 +26,7 @@ IOManager.format = () ->
   @dictIOPublic = {}
   for name, ioDefine of @dictIODefine
     io = IOWrapper.wrap(ioDefine, @dictIO)
-    if ioDefine.public
-      @dictIO[name] = io
-      @dictIOPublic[name] = io
-    else
-      @dictIO[name] = io
+    @dictIO[name] = io
 
 
 
