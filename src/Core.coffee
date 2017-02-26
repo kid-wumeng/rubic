@@ -1,6 +1,7 @@
 requireDir = require('require-dir')
 SchemaManager = require('./io/SchemaManager')
 IOManager = require('./io/IOManager')
+HTTPServer = require('./net/HTTPServer')
 
 
 
@@ -17,16 +18,7 @@ Core.init = (config) ->
   IOManager.save(dictIODefine)
   IOManager.format()
 
-
-
-Core.call = (name, data) ->
-  ioDefine = IOManager.dictIODefine[name]
-  if ioDefine and ioDefine.public
-    io = IOManager.dictIO[name]
-    return await io(data)
-  else
-    # @TODO Error
-    throw '无此API'
+  HTTPServer.listen(3000)
 
 
 
