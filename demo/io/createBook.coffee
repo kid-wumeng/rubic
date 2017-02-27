@@ -1,6 +1,6 @@
 module.exports =
 
-  inSchema:
+  iSchema:
     name: 'Book.name'
     isbn: 'Book.isbn'
     author: 'Author'

@@ -96,6 +96,20 @@ exports.VALUE_CHECK_FAILED_MAX_BUFFER = class extends Error
 
 
 
+exports.VALUE_CHECK_FAILED_MIMES = class extends Error
+  constructor: ({key, value, mimes}) ->
+    super()
+    @message = "数据校验失败：属性#{key}的MIME类型限制为：#{mimes.join(', ')}"
+
+
+
+exports.VALUE_CHECK_FAILED_CUSTOM = class extends Error
+  constructor: ({key, value, mimes}) ->
+    super()
+    @message = "数据校验失败：未通过开发者的自定义检查"
+
+
+
 exports.TOKEN_SECRET_NOT_FOUND = class extends Error
   constructor: () ->
     super()

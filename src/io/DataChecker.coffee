@@ -1,4 +1,5 @@
 _ = require('lodash')
+fileType = require 'file-type'
 Error = require('../Error')
 
 
@@ -10,23 +11,56 @@ class DataChecker
 
 
 # 规则集
-# $default {Boolean}   默认值，设置为null或undefined是没意义的
-# $require {Boolean}   必要性
-# $type    {Object}    可选类型：Boolean|Number|String|Buffer|Date
-# $enums   {Array(*)}  枚举范围
-# $min     {Number}    Number最小值|String最小长度|Buffer最小长度|Date最小时间戳
-# $max     {Number}    Number最大值|String最大长度|Buffer最大长度|Date最大时间戳
+# $default {Boolean}       默认值，设置为null或undefined是没意义的
+# $require {Boolean}       必要性
+# $type    {Object}        可选类型：Boolean|Number|String|Buffer|Date
+# $enums   {Array(*)}      枚举范围
+# $min     {Number}        Number最小值|String最小长度|Buffer最小长度|Date最小时间戳
+# $max     {Number}        Number最大值|String最大长度|Buffer最大长度|Date最大时间戳
+# $mimes   {Array[String]} 允许的文件MIME类型，Buffer专用规则
+# $check   {Function}      开发者自己定义的规则，属性值作为参数传入，返回true/false代表是否通过
 
 
 
-DataChecker.check = (data={}, schema={}) ->
+DataChecker.check = (data={}, schema) ->
+  @checkObject('', data, schema)
+
+
+
+DataChecker.checkObject = (baseKey, data, schema) ->
+  # 只处理朴素对象
+  if !_.isPlainObject(data)
+    return
+  # 遍历模式规则，逐条比对
   for key, rule of schema
+    key = if baseKey then "#{baseKey}.#{key}" else key
     value = _.get(data, key)
-    @checkEach(key, value, rule)
+    # 处理数组
+    if rule.$type is Array
+      @checkArray(key, value, rule.$schema)
+    # 处理值
+    else
+      @checkValue(key, value, rule)
 
 
 
-DataChecker.checkEach = (key, value, rule) ->
+DataChecker.checkArray = (key, array, schema) ->
+  # 只处理数组
+  if not Array.isArray(array)
+    return
+  # 遍历并格式化节点
+  for node in array
+    # 如果模式有$type属性，表示数组中应该是值节点，比如[1, 2, 3]
+    if schema.$type
+      @checkValue(key, node, schema)
+    # 否则表示数组中应该是对象，比如[{name: 'kid'}, {name: 'wumeng'}]
+    else
+      @checkObject(key, node, schema)
+    # @REVIEW 暂时不支持数组中直接嵌套数组，比如[[1, 2, 3], [1, 2, 3]]
+
+
+
+DataChecker.checkValue = (key, value, rule) ->
   @checkRequire(key, value, rule)
   if value is null
     return
@@ -34,6 +68,8 @@ DataChecker.checkEach = (key, value, rule) ->
   @checkEnums(key, value, rule)
   @checkMin(key, value, rule)
   @checkMax(key, value, rule)
+  @checkMimes(key, value, rule)
+  @checkCustom(key, value, rule)
 
 
 
@@ -101,6 +137,23 @@ DataChecker.checkMax = (key, value, rule) ->
     when Buffer
       if value.length > max
         throw new Error.VALUE_CHECK_FAILED_MIN_BUFFER({key, value, max})
+
+
+
+DataChecker.checkMimes = (key, value, rule) ->
+  if rule.$type is Buffer
+    mimes = rule.$mimes
+    mime = fileType(value).mime
+    if mimes and !mimes.includes(mime)
+      throw new Error.VALUE_CHECK_FAILED_MIMES({key, value, mimes})
+
+
+
+DataChecker.checkCustom = (key, value, rule) ->
+  check = rule.$check
+  if check
+    if check(value) isnt true
+      throw new Error.VALUE_CHECK_FAILED_CUSTOM({key, value})
 
 
 
