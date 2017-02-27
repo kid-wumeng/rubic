@@ -1,6 +1,7 @@
 requireDir = require('require-dir')
 SchemaManager = require('./io/SchemaManager')
 IOManager = require('./io/IOManager')
+TokenManager = require('./io/TokenManager')
 HTTPServer = require('./net/HTTPServer')
 
 
@@ -17,6 +18,9 @@ Core.init = (config) ->
   dictIODefine = requireDir(config.dir.io)
   IOManager.save(dictIODefine)
   IOManager.format()
+
+  TokenManager.saveDict(config.token)
+  TokenManager.saveSecret(config.tokenSecret)
 
   HTTPServer.listen(3000)
 

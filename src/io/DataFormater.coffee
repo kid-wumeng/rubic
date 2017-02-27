@@ -6,7 +6,7 @@ class DataFormater
 
 
 
-DataFormater.format = (data, schema) ->
+DataFormater.format = (data={}, schema) ->
   @formatObject(data, schema)
 
 

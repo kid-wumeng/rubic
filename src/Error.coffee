@@ -93,3 +93,38 @@ exports.VALUE_CHECK_FAILED_MAX_BUFFER = class extends Error
   constructor: ({key, value, min}) ->
     super()
     @message = "数据校验失败：属性#{key}太大，不应该大于#{min}个字节"
+
+
+
+exports.TOKEN_SECRET_NOT_FOUND = class extends Error
+  constructor: () ->
+    super()
+    @message = "令牌系统异常"
+
+
+
+exports.TOKEN_TYPE_NOT_FOUND = class extends Error
+  constructor: ({type}) ->
+    super()
+    @message = "找不到这种类型的令牌：#{type}"
+
+
+
+exports.TOKEN_CHECK_FAILED_REQUIRE = class extends Error
+  constructor: () ->
+    super()
+    @message = "令牌校验失败：缺少必要的令牌"
+
+
+
+exports.TOKEN_CHECK_FAILED_TYPE = class extends Error
+  constructor: () ->
+    super()
+    @message = "令牌校验失败：类型不匹配"
+
+
+
+exports.TOKEN_CHECK_FAILED_EXPIRES = class extends Error
+  constructor: () ->
+    super()
+    @message = "令牌校验失败：已过期，请重新登录"

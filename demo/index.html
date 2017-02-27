@@ -52,6 +52,15 @@
         }
       }
 
+      Core.createFormData = function(data){
+        var formData = new FormData();
+        data = Core.parse(data);
+        Core.appendJSON(formData, data.jsonDict);
+        Core.appendDate(formData, data.dateDict);
+        Core.appendFile(formData, data.fileDict);
+        return formData
+      }
+
       Core.appendJSON = function(formData, jsonDict){
         formData.append('$jsonDict', JSON.stringify(jsonDict));
       }
@@ -69,16 +78,58 @@
         }
       }
 
-      Core.call = function(ioName, data){
-        var formData = new FormData();
-        data = Core.parse(data);
-        Core.appendJSON(formData, data.jsonDict);
-        Core.appendDate(formData, data.dateDict);
-        Core.appendFile(formData, data.fileDict);
+      Core.setHeader = function(xhr, ioName){
+        xhr.setRequestHeader('rubik-io', ioName);
+        var token = localStorage.getItem('rubik-token');
+        if(token){
+          xhr.setRequestHeader('rubik-token', token);
+        }
+      }
+
+      Core.call = function(io, data){
+        if(typeof(io) !== 'string'){
+          throw '未设置io';
+        }
+
+        data = data || {};
+        var formData = Core.createFormData(data);
 
         var xhr = new XMLHttpRequest();
-        xhr.open('POST', _host);
+        xhr.open('POST', _host, true);
+        Core.setHeader(xhr, io);
         xhr.send(formData);
+
+        return new Promise(function(resolve, reject){
+          xhr.onreadystatechange = Core.onReadyStateChange.bind({
+            xhr: xhr,
+            resolve: resolve,
+            reject: reject
+          })
+        });
+      }
+
+      Core.onReadyStateChange = function(){
+        if(this.xhr.readyState === XMLHttpRequest.DONE){
+          if(this.xhr.status === 200){
+            Core.handleSuccess(this.xhr, this.resolve);
+          }else{
+            Core.handleFailure(this.xhr, this.reject);
+          }
+        }
+      }
+
+      Core.handleSuccess = function(xhr, resolve){
+        var token = xhr.getResponseHeader('rubik-token')
+        if(token){
+          localStorage.setItem('rubik-token', token);
+        }
+        var data = JSON.parse(xhr.responseText);
+        resolve(data);
+      }
+
+      Core.handleFailure = function(xhr, reject){
+        var error = JSON.parse(xhr.responseText);
+        reject(error);
       }
 
       window.Rubic = Core;
@@ -91,14 +142,28 @@
     function upload(){
       var file = document.getElementById('input').files[0]
       Rubic.call('findBook', {
+        id: 999,
         name: '哈利波特',
         author: {
           name: '罗琳',
           age: 18
         },
-        face: file,
+        fans: [{
+          name: 'Peter'
+        },{
+          name: 'Rose'
+        },{
+          name: 'David'
+        }],
+        faces: [file, file],
         createDate: new Date()
-      });
+      }).then(function(data){
+        console.log(data)
+        console.log(1)
+      }).catch(function(error){
+        console.log(error)
+        console.log(2)
+      })
     }
 
   </script>

@@ -13,18 +13,32 @@ class HTTPServer
 
 HTTPServer.listen = (port) ->
   app = new Koa()
-  app.use(cors({origin: '*'}))
+  app.use(cors({
+    origin: '*',
+    exposeHeaders: ['rubik-io', 'rubik-token']
+  }))
   app.use(@callback)
   app.listen(3000)
 
 
 
 HTTPServer.callback = (ctx) ->
-  data = await DataParser.parse(ctx)
+  io = ctx.get('rubik-io')
+  token = ctx.get('rubik-token')
   try
-    ctx.body = await IOCaller.call('findBook', data)
+    data = await DataParser.parse(ctx)
+    {data, token} = await IOCaller.call('findBook', {data, token})
+    ctx.body = data
+    if token
+      ctx.set('rubik-token', token)
   catch error
-    console.log error.stack.red
+    if typeof(error) is 'string'
+      message = error
+    else
+      message = error.message
+    console.log message.red
+    ctx.body = {message}
+    ctx.status = 500
 
 
 

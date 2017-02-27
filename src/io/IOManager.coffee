@@ -23,7 +23,6 @@ IOManager.save = (dictIODefine) ->
 
 IOManager.format = () ->
   @dictIO = {}
-  @dictIOPublic = {}
   for name, ioDefine of @dictIODefine
     io = IOWrapper.wrap(ioDefine, @dictIO)
     @dictIO[name] = io
