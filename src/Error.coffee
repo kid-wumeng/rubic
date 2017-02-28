@@ -142,3 +142,24 @@ exports.TOKEN_CHECK_FAILED_EXPIRES = class extends Error
   constructor: () ->
     super()
     @message = "令牌校验失败：已过期，请重新登录"
+
+
+
+exports.DATABASE_QUERY_OPTION_INVALID_SORT = class extends Error
+  constructor: () ->
+    super()
+    @message = "数据库查询条件无效：sort()的排序值只能是1或-1"
+
+
+
+exports.DATABASE_QUERY_OPTION_INVALID_PAGE = class extends Error
+  constructor: () ->
+    super()
+    @message = "数据库查询条件无效：page()的值必须是正数"
+
+
+
+exports.DATABASE_QUERY_OPTION_INVALID_SIZE = class extends Error
+  constructor: () ->
+    super()
+    @message = "数据库查询条件无效：size()的值必须是0或正数"

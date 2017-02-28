@@ -27,7 +27,10 @@ Core.init = (config) ->
     # @TEMP
     DB = require('./database/MongoDB/DB')
     await DB.connect(config.database)
-    console.log await DB.findAll('Book')
+    book = await DB.table('Book').create({name: '三国志'})
+    console.log book
+
+
 
     # HTTPServer.listen(3000)
     # console.log 'rubik start, good luck ~'.green
