@@ -14,7 +14,8 @@ class HTTPServer
 HTTPServer.listen = (port) ->
   app = new Koa()
   app.use(cors({
-    origin: '*',
+    origin: '*'
+    allowMethods: ['POST']
     exposeHeaders: ['rubik-io', 'rubik-token']
   }))
   app.use(@callback)

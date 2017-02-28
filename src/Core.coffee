@@ -1,3 +1,4 @@
+colors = require('colors')
 requireDir = require('require-dir')
 SchemaManager = require('./io/SchemaManager')
 IOManager = require('./io/IOManager')
@@ -11,26 +12,27 @@ class Core
 
 
 Core.init = (config) ->
-  dictSchema = requireDir(config.dir.schema)
-  SchemaManager.save(dictSchema)
-  SchemaManager.formatBaseSchemaDict()
+  try
+    dictSchema = requireDir(config.dir.schema)
+    SchemaManager.save(dictSchema)
+    SchemaManager.formatBaseSchemaDict()
 
-  dictIODefine = requireDir(config.dir.io)
-  IOManager.save(dictIODefine)
-  IOManager.format()
+    dictIODefine = requireDir(config.dir.io)
+    IOManager.save(dictIODefine)
+    IOManager.format()
 
-  TokenManager.saveDict(config.token)
-  TokenManager.saveSecret(config.tokenSecret)
+    TokenManager.saveDict(config.token)
+    TokenManager.saveSecret(config.tokenSecret)
 
-  HTTPServer.listen(3000)
+    # @TEMP
+    DB = require('./database/MongoDB/DB')
+    await DB.connect(config.database)
+    console.log await DB.findAll('Book')
 
-
-
-# Core.table = (table, schema) ->
-#   schema ?= table
-#   schema = Store.schemaDict[schema]
-#   # @TODO 存在性检查
-#   return new Query({table, schema})
+    # HTTPServer.listen(3000)
+    # console.log 'rubik start, good luck ~'.green
+  catch error
+    console.log error.message.red
 
 
 

@@ -9,4 +9,6 @@ Core.init({
   tokenSecret: 'kid'
   token:
     user: 60
+  database:
+    name: 'test'
 })
