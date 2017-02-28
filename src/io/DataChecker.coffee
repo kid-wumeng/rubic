@@ -11,14 +11,14 @@ class DataChecker
 
 
 # 规则集
-# $default {Boolean}       默认值，设置为null或undefined是没意义的
-# $require {Boolean}       必要性
-# $type    {Object}        可选类型：Boolean|Number|String|Buffer|Date
-# $enums   {Array(*)}      枚举范围
-# $min     {Number}        Number最小值|String最小长度|Buffer最小长度|Date最小时间戳
-# $max     {Number}        Number最大值|String最大长度|Buffer最大长度|Date最大时间戳
-# $mimes   {Array[String]} 允许的文件MIME类型，Buffer专用规则
-# $check   {Function}      开发者自己定义的规则，属性值作为参数传入，返回true/false代表是否通过
+# $default  {Boolean}         默认值，设置为null或undefined是没意义的
+# $require  {Boolean}         必要性
+# $type     {Object}          可选类型：Boolean|Number|String|Buffer|Date
+# $enums    {Array(*)}        枚举范围
+# $min      {Number}          Number最小值|String最小长度|Buffer最小长度|Date最小时间戳
+# $max      {Number}          Number最大值|String最大长度|Buffer最大长度|Date最大时间戳
+# $mimes    {Array[String]}   允许的文件MIME类型，Buffer专用规则
+# $check    {Function}        开发者自己定义的规则，属性值作为参数传入，返回true/false代表是否通过
 
 
 
@@ -69,6 +69,7 @@ DataChecker.checkValue = (key, value, rule) ->
   @checkMin(key, value, rule)
   @checkMax(key, value, rule)
   @checkMimes(key, value, rule)
+  @checkFormat(key, value, rule)
   @checkCustom(key, value, rule)
 
 
@@ -116,7 +117,7 @@ DataChecker.checkMin = (key, value, rule) ->
       if value < min
         throw new Error.VALUE_CHECK_FAILED_MIN_NUMBAR({key, value, min})
     when String
-      if value.length < min
+      if @countChar(value) < min
         throw new Error.VALUE_CHECK_FAILED_MIN_STRING({key, value, min})
     when Buffer
       if value.length < min
@@ -130,13 +131,22 @@ DataChecker.checkMax = (key, value, rule) ->
   switch rule.$type
     when Number
       if value > max
-        throw new Error.VALUE_CHECK_FAILED_MIN_NUMBAR({key, value, max})
+        throw new Error.VALUE_CHECK_FAILED_MAX_NUMBAR({key, value, max})
     when String
-      if value.length > max
-        throw new Error.VALUE_CHECK_FAILED_MIN_STRING({key, value, max})
+      if @countChar(value) > max
+        throw new Error.VALUE_CHECK_FAILED_MAX_STRING({key, value, max})
     when Buffer
       if value.length > max
-        throw new Error.VALUE_CHECK_FAILED_MIN_BUFFER({key, value, max})
+        throw new Error.VALUE_CHECK_FAILED_MAX_BUFFER({key, value, max})
+
+
+
+DataChecker.checkFormat = (key, value, rule) ->
+  if rule.$type is String and rule.$format
+    switch rule.$format
+      when 'email'
+        if not /^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$/.test(value)
+          throw "#{key}不是email"
 
 
 
@@ -154,6 +164,16 @@ DataChecker.checkCustom = (key, value, rule) ->
   if check
     if check(value) isnt true
       throw new Error.VALUE_CHECK_FAILED_CUSTOM({key, value})
+
+
+
+# @TODO 暂时全使用width模式
+DataChecker.countChar = (string) ->
+  count = 0
+  for char, i in string
+    code = string.charCodeAt(i)
+    count += if code <= 255 then 1 else 2
+  return count
 
 
 

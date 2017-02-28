@@ -76,23 +76,23 @@ exports.VALUE_CHECK_FAILED_MIN_BUFFER = class extends Error
 
 
 exports.VALUE_CHECK_FAILED_MAX_NUMBAR = class extends Error
-  constructor: ({key, value, min}) ->
+  constructor: ({key, value, max}) ->
     super()
-    @message = "数据校验失败：属性#{key}太大，当前#{value}，不应该大于#{min}"
+    @message = "数据校验失败：属性#{key}太大，当前#{value}，不应该大于#{max}"
 
 
 
 exports.VALUE_CHECK_FAILED_MAX_STRING = class extends Error
-  constructor: ({key, value, min}) ->
+  constructor: ({key, value, max}) ->
     super()
-    @message = "数据校验失败：属性#{key}字太多，不应该多于#{min}个字"
+    @message = "数据校验失败：属性#{key}字太多，不应该多于#{max}个字"
 
 
 
 exports.VALUE_CHECK_FAILED_MAX_BUFFER = class extends Error
-  constructor: ({key, value, min}) ->
+  constructor: ({key, value, max}) ->
     super()
-    @message = "数据校验失败：属性#{key}太大，不应该大于#{min}个字节"
+    @message = "数据校验失败：属性#{key}太大，不应该大于#{max}个字节"
 
 
 

@@ -5,6 +5,9 @@ module.exports =
       $ref: 'Book.id'
       $check: (id) ->
         return id > 6
+    name:
+      $type: String
+      $format: 'email'
     faces: [{
       $type: Buffer
       $mimes: ['image/jpeg']
