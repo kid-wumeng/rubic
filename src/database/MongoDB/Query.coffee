@@ -7,66 +7,46 @@ Error = require('../../Error')
 
 class Query
   constructor: ({@db, @tableName, @all}) ->
+    ###
+      例子：
+      treeQuery =
+        name: 'kid'
+        pet:
+          age:
+            $gte: 3
+            $lte: 8
+    ###
+    @treeQuery = {}
 
+    ###
+      例子：
+      dictOption =
+        sort:
+          id: 1
+        skip: 20
+        limit: 5
+        fields:
+          name: 1
+    ###
+    @dictOption = {}
 
+    ###
+      例子：
+      dictModifier =
+        $set:
+          name: 'kid'
+        $inc:
+          age: 1
+    ###
+    @dictModifier = {}
 
-Query.prototype.db = null
-Query.prototype.tableName = null
-Query.prototype.all = false
+    # 为了前端使用方便，首页从1开始，而不是0
+    @valuePage = 1
+    # 0代表无限制
+    @valueSize = 0
 
-
-
-###
-  例子：
-  treeQuery =
-    name: 'kid'
-    pet:
-      age:
-        $gte: 3
-        $lte: 8
-###
-Query.prototype.treeQuery = {}
-
-
-
-###
-  例子：
-  dictOption =
-    sort:
-      id: 1
-    skip: 20
-    limit: 5
-    fields:
-      name: 1
-###
-Query.prototype.dictOption = {}
-
-
-
-###
-  例子：
-  dictModifier =
-    $set:
-      name: 'kid'
-    $inc:
-      age: 1
-###
-Query.prototype.dictModifier = {
-  $set: {}
-  $inc: {}
-}
-
-
-
-# 为了前端使用方便，首页从1开始，而不是0
-Query.valuePage = 1
-# 0代表无限制
-Query.valueSize = 0
-
-
-
-# 当前where对应的key，仅用于收集条件的临时值
-Query.prototype.currentKey = null
+    # 当前where对应的key，仅用于收集条件的临时值
+    @currentKey = null
 
 
 
@@ -166,10 +146,13 @@ Query.prototype.set = (args...) ->
   if args.length is 2
     key = args[0]
     value = args[1]
+    _.set(@dictModifier, "$set.#{key}", value)
     @dictModifier.$set[key] = value
   else
     first = args[0]
     if _.isObject(first)
+      # @REVIEW
+      @dictModifier.$set ?= {}
       Object.assign(@dictModifier.$set, first)
   return @
 
@@ -185,13 +168,8 @@ Query.prototype.inc = (args...) ->
   if args.length is 2
     key = args[0]
     value = args[1]
-    @dictModifier.$inc[key] = value
-  else
-    first = args[0]
-    if _.isObject(first)
-      Object.assign(@dictModifier.$set, first)
-    else if typeof(first) is 'number'
-      @dictModifier.$inc[key] = 1
+    _.set(@dictModifier, "$inc.#{key}", value)
+  # @TODO 实现2、3
   return @
 
 
@@ -206,7 +184,9 @@ Query.prototype.fetch = () ->
 
 
 
-Query.prototype.update = () ->
+Query.prototype.update = (args...) ->
+  if args.length
+    @set(args...)
   @format()
   executor = new Executor({db: @db, tableName: @tableName})
   return executor.update(@treeQuery, @dictModifier)

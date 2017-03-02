@@ -14,7 +14,7 @@ class Core
 
 Core.init = (config) ->
   try
-    
+
     dictSchema = requireDir(config.dir.schema)
     SchemaManager.save(dictSchema)
     SchemaManager.formatBaseSchemaDict()
@@ -29,10 +29,10 @@ Core.init = (config) ->
     await DB.connect(config.database)
 
     HTTPServer.listen(3000)
-    console.log 'rubik start, good luck ~'.green
+    console.log 'rubic start, good luck ~'.green
 
   catch error
-    console.log error.message.red
+    console.log error.toString().red
 
 
 

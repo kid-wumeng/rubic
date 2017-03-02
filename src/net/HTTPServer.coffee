@@ -4,6 +4,7 @@ cors = require('koa2-cors')
 asyncBusboy = require('async-busboy')
 DataParser = require('./DataParser')
 IOCaller = require('../io/IOCaller')
+Error = require('../Error')
 
 
 
@@ -16,7 +17,7 @@ HTTPServer.listen = (port) ->
   app.use(cors({
     origin: '*'
     allowMethods: ['POST']
-    exposeHeaders: ['rubik-io', 'rubik-token']
+    exposeHeaders: ['rubic-io', 'rubic-token']
   }))
   app.use(@callback)
   app.listen(3000)
@@ -24,15 +25,18 @@ HTTPServer.listen = (port) ->
 
 
 HTTPServer.callback = (ctx) ->
-  io = ctx.get('rubik-io')
-  token = ctx.get('rubik-token')
+  io = ctx.get('rubic-io')
+  token = ctx.get('rubic-token')
   try
-    data = await DataParser.parse(ctx)
-    {data, token} = await IOCaller.call('findBook', {data, token})
-    ctx.body = data
+    data = await DataParser.combine(ctx)
+    {data, token} = await IOCaller.call(io, {data, token})
+    {jsonDict, dateDict} = DataParser.split(data)
+    ctx.body = {jsonDict, dateDict}
     if token
-      ctx.set('rubik-token', token)
+      ctx.set('rubic-token', token)
   catch error
+    if error instanceof Error.TOKEN_CHECK_FAILED_EXPIRES
+      ctx.set('rubic-token-expires', true)
     if typeof(error) is 'string'
       message = error
     else

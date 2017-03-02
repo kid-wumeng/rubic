@@ -62,7 +62,7 @@ DataChecker.checkArray = (key, array, schema) ->
 
 DataChecker.checkValue = (key, value, rule) ->
   @checkRequire(key, value, rule)
-  if value is null
+  if value is undefined
     return
   @checkType(key, value, rule)
   @checkEnums(key, value, rule)
@@ -76,7 +76,7 @@ DataChecker.checkValue = (key, value, rule) ->
 
 DataChecker.checkRequire = (key, value, rule) ->
   if rule.$require is true
-    if value is null
+    if value is undefined
       throw new Error.VALUE_CHECK_FAILED_REQUIRE({key})
 
 

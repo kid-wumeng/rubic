@@ -7,11 +7,6 @@ class Executor
 
 
 
-Executor.prototype.db = null
-Executor.prototype.tableName = null
-
-
-
 Executor.prototype.makeID = () ->
   result = await @db.collection('IDStore').findOneAndUpdate({
     table: @tableName
@@ -54,6 +49,7 @@ Executor.prototype.create = (data={}) ->
 
 Executor.prototype.update = (query, modifier) ->
   modifier.$set.updateDate = new Date()
+  delete modifier.$set.id
   option = {returnOriginal: false}
   result = await @db
     .collection(@tableName)

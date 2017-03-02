@@ -12,7 +12,3 @@ Core = require('./src/Core')
 #   database:
 #     name: 'test'
 # })
-
-
-
-module.exports = Core

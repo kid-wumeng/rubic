@@ -1,14 +1,19 @@
 ;(function(){
 
   var _host = null;
+  var _onFailure = null;
 
   var Core = {};
 
   Core.host = function(host){
     if(host[host.length-1] !== '/'){
-      host += '/'
+      host += '/';
     }
-    _host = host
+    _host = host;
+  }
+
+  Core.onFailure = function(onFailure){
+    _onFailure = onFailure;
   }
 
   Core.parse = function(data){
@@ -67,10 +72,10 @@
   }
 
   Core.setHeader = function(xhr, ioName){
-    xhr.setRequestHeader('rubik-io', ioName);
-    var token = localStorage.getItem('rubik-token');
+    xhr.setRequestHeader('rubic-io', ioName);
+    var token = localStorage.getItem('rubic-token');
     if(token){
-      xhr.setRequestHeader('rubik-token', token);
+      xhr.setRequestHeader('rubic-token', token);
     }
   }
 
@@ -107,19 +112,59 @@
   }
 
   Core.handleSuccess = function(xhr, resolve){
-    var token = xhr.getResponseHeader('rubik-token')
+    var token = xhr.getResponseHeader('rubic-token')
     if(token){
-      localStorage.setItem('rubik-token', token);
+      localStorage.setItem('rubic-token', token);
     }
-    var data = JSON.parse(xhr.responseText);
+    var result = JSON.parse(xhr.responseText);
+    var data = {};
+    var key;
+    var value;
+    for(key in result.jsonDict){
+      value = result.jsonDict[key]
+      Core.set(data, key, value)
+    }
+    for(key in result.dateDict){
+      value = result.dateDict[key]
+      value = new Date(value)
+      Core.set(data, key, value)
+    }
     resolve(data);
   }
 
   Core.handleFailure = function(xhr, reject){
+    var tokenExpires = xhr.getResponseHeader('rubic-token-expires');
+    if(tokenExpires){
+      localStorage.removeItem('rubic-token');
+    }
     var error = JSON.parse(xhr.responseText);
-    reject(error);
+    if(_onFailure){
+      _onFailure(error);
+    }else{
+      reject(error);
+    }
   }
 
-  window.Rubic = Core;
+  Core.set = function(object, key, value){
+    var names = key.split('.');
+    for(var i = 0; i < names.length-1; i++){
+      var name = names[i]
+      var nextName = names[i+1]
+      if(/^\d+$/.test(nextName)){
+        if(!(object[name] instanceof Array)){
+          object[name] = []
+        }
+      }else{
+        if(typeof(object[name]) !== 'object'){
+          object[name] = {}
+        }
+      }
+      object = object[name]
+    }
+    var lastName = names[names.length-1]
+    object[lastName] = value
+  }
+
+  global.rubic = Core;
 
 })();

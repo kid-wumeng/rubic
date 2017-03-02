@@ -8,7 +8,7 @@ class DataParser
 
 
 
-DataParser.parse = (ctx) ->
+DataParser.combine = (ctx) ->
   {fields, files} = await asyncBusboy(ctx.req)
   {$jsonDict, $dateDict} = fields
   jsonDict = JSON.parse($jsonDict)
@@ -24,6 +24,26 @@ DataParser.parse = (ctx) ->
     buffer = await fs.readFileAsync(file.path)
     _.set(data, file.fieldname, buffer)
   return data
+
+
+
+DataParser.split = (data) ->
+  traversal = (node) ->
+    type = typeof(node)
+    if type is 'boolean' or type is 'number' or type is 'string'
+      jsonDict[cursor.join('.')] = node
+    else if node instanceof Date
+      dateDict[cursor.join('.')] = node.getTime()
+    else
+      for name, child of node
+        cursor.push(name)
+        traversal(child)
+    cursor.pop()
+  jsonDict = {}
+  dateDict = {}
+  cursor = []
+  traversal(data)
+  return { jsonDict, dateDict }
 
 
 

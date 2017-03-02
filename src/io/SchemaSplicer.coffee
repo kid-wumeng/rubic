@@ -12,8 +12,8 @@ class SchemaSplicer
 ###
 SchemaSplicer.splice = (node, schemaDict) ->
   if Array.isArray(node)
-    first = @splice(node[0], schemaDict)
-    return [first]
+    node[0] = @splice(node[0], schemaDict)
+    return node
   if !_.isPlainObject(node)
     return node
   # 接合本节点$ref，参考的模式可能也有$ref，所以进行继承式接合
@@ -24,6 +24,7 @@ SchemaSplicer.splice = (node, schemaDict) ->
     ref = refSchema.$ref
   # 接合全部子节点
   for name, child of node
+
     node[name] = @splice(child, schemaDict)
   return node
 

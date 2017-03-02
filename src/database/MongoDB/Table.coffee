@@ -9,11 +9,6 @@ class Table
 
 
 
-Table.db = null
-Table.tableName = null
-
-
-
 Table.prototype.find = (args...) ->
   query = new Query({db: @db, tableName: @tableName})
   if args.length

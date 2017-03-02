@@ -30,7 +30,8 @@ DataFormater.formatObject = (data, schema) ->
       value = @formatValue(value, rule)
     # 处理完毕，添加
     # 因为是线性化模式，所以无需处理嵌套的对象
-    _.set(dataFormatted, key, value)
+    if value isnt undefined
+      _.set(dataFormatted, key, value)
   return dataFormatted
 
 
@@ -57,17 +58,17 @@ DataFormater.formatArray = (array, schema) ->
 DataFormater.formatValue = (value, rule) ->
   switch rule.$type
     when Boolean
-      value = null if !_.isBoolean(value)
+      value = undefined if !_.isBoolean(value)
     when Number
-      value = null if !_.isNumber(value)
+      value = undefined if !_.isNumber(value)
     when String
-      value = null if !_.isString(value)
+      value = undefined if !_.isString(value)
     when Buffer
-      value = null if not (value instanceof Buffer)
+      value = undefined if not (value instanceof Buffer)
     when Date
-      value = null if not (value instanceof Date)
+      value = undefined if not (value instanceof Date)
   # 如果值为空，则设为默认值；如果连默认值也没有，则设为null
-  value ?= rule.$default ? null
+  value ?= rule.$default ? undefined
   return value
 
 

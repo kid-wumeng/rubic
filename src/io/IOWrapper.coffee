@@ -2,6 +2,7 @@ SchemaManager = require('./SchemaManager')
 TokenModem = require('./TokenModem')
 DataFormater = require('./DataFormater')
 DataChecker = require('./DataChecker')
+DB = require('../database/MongoDB/DB')
 
 
 
@@ -34,6 +35,8 @@ IOWrapper.createContext = ({dictIO}) ->
   ctx.out = {}
   ctx.signToken = (type, data) ->
     ctx.out.token = TokenModem.encode(type, data)
+  ctx.table = (tableName) ->
+    return DB.table(tableName)
   return ctx
 
 
