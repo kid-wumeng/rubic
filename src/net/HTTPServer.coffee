@@ -41,7 +41,7 @@ HTTPServer.callback = (ctx) ->
       message = error
     else
       message = error.message
-    console.log message.red
+    console.log error.toString().red
     ctx.body = {message}
     ctx.status = 500
 

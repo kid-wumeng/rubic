@@ -14,17 +14,26 @@ IOWrapper.wrap = (ioDefine={}, dictIO) ->
   @formatSchema(ioDefine)
   {iSchema, oSchema, io} = ioDefine
 
-  return (inData={}) ->
-    ctx = IOWrapper.createContext({dictIO})
-    inData = DataFormater.format(inData, iSchema)
-    DataChecker.check(inData, iSchema)
-
-    outData = await io.call(ctx, inData)
-
-    outData = DataFormater.format(outData, oSchema)
-    out = ctx.out
-    out.data = outData
-    return out
+  if io.constructor.name is 'AsyncFunction'
+    return (inData={}) ->
+      ctx = IOWrapper.createContext({dictIO})
+      inData = DataFormater.format(inData, iSchema)
+      DataChecker.check(inData, iSchema)
+      outData = await io.call(ctx, inData)
+      outData = DataFormater.format(outData, oSchema)
+      out = ctx.out
+      out.data = outData
+      return out
+  else
+    return (inData={}) ->
+      ctx = IOWrapper.createContext({dictIO})
+      inData = DataFormater.format(inData, iSchema)
+      DataChecker.check(inData, iSchema)
+      outData = io.call(ctx, inData)
+      outData = DataFormater.format(outData, oSchema)
+      out = ctx.out
+      out.data = outData
+      return out
 
 
 

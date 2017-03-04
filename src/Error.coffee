@@ -71,7 +71,7 @@ exports.VALUE_CHECK_FAILED_MIN_STRING = class extends Error
 exports.VALUE_CHECK_FAILED_MIN_BUFFER = class extends Error
   constructor: ({key, value, min}) ->
     super()
-    @message = "数据校验失败：属性#{key}太小，不应该小于#{min}个字节"
+    @message = "数据校验失败：属性#{key}太小，不应该小于#{parseInt(min/1024)}KB"
 
 
 
@@ -92,7 +92,7 @@ exports.VALUE_CHECK_FAILED_MAX_STRING = class extends Error
 exports.VALUE_CHECK_FAILED_MAX_BUFFER = class extends Error
   constructor: ({key, value, max}) ->
     super()
-    @message = "数据校验失败：属性#{key}太大，不应该大于#{max}个字节"
+    @message = "数据校验失败：属性#{key}太大，不应该大于#{parseInt(max/1024)}KB"
 
 
 

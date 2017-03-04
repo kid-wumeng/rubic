@@ -22,6 +22,7 @@ DataParser.combine = (ctx) ->
     _.set(data, key, value)
   for file in files
     buffer = await fs.readFileAsync(file.path)
+    buffer.$file = file
     _.set(data, file.fieldname, buffer)
   return data
 
