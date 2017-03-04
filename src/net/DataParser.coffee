@@ -35,6 +35,8 @@ DataParser.split = (data) ->
       jsonDict[cursor.join('.')] = node
     else if node instanceof Date
       dateDict[cursor.join('.')] = node.getTime()
+    else if Array.isArray(node) and node.length is 0
+      jsonDict[cursor.join('.')] = []
     else
       for name, child of node
         cursor.push(name)

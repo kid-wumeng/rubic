@@ -32,7 +32,7 @@ Core.init = (config) ->
     console.log 'rubic start, good luck ~'.green
 
   catch error
-    console.log error.toString().red
+    console.log error
 
 
 
