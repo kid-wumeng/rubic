@@ -60,7 +60,9 @@ Query.prototype.where = (args...) ->
   if args.length is 2
     key = args[0]
     value = args[1]
-    _.set(@treeQuery, key, value)
+    if !@treeQuery[key]
+      @treeQuery[key] = {}
+    @treeQuery[key] = value
   else
     first = args[0]
     if _.isObject(first)
@@ -72,19 +74,33 @@ Query.prototype.where = (args...) ->
 
 
 Query.prototype.is = (value) ->
-  _.set(@treeQuery, @currentKey, value)
+  if !@treeQuery[@currentKey]
+    @treeQuery[@currentKey] = {}
+  @treeQuery[@currentKey] = value
   return @
 
 
 
 Query.prototype.min = (value) ->
-  _.set(@treeQuery, "#{@currentKey}.$gte", value)
+  if !@treeQuery[@currentKey]
+    @treeQuery[@currentKey] = {}
+  @treeQuery[@currentKey].$gte = value
   return @
 
 
 
 Query.prototype.max = (value) ->
-  _.set(@treeQuery, "#{@currentKey}.$lte", value)
+  if !@treeQuery[@currentKey]
+    @treeQuery[@currentKey] = {}
+  @treeQuery[@currentKey].$lte = value
+  return @
+
+
+
+Query.prototype.in = (value) ->
+  if !@treeQuery[@currentKey]
+    @treeQuery[@currentKey] = {}
+  @treeQuery[@currentKey].$in = value
   return @
 
 
