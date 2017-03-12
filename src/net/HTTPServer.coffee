@@ -29,9 +29,12 @@ HTTPServer.callback = (ctx) ->
   token = ctx.get('rubic-token')
   try
     data = await DataParser.combine(ctx)
-    {data, token} = await IOCaller.call(io, {data, token})
+    data = await IOCaller.call(io, {data, token})
+    {token} = data.$ctx.out
+    delete data.$ctx
     {jsonDict, dateDict} = DataParser.split(data)
     ctx.body = {jsonDict, dateDict}
+
     if token
       ctx.set('rubic-token', token)
   catch error
@@ -41,7 +44,7 @@ HTTPServer.callback = (ctx) ->
       message = error
     else
       message = error.message
-    console.log error.toString().red
+    console.log error
     ctx.body = {message}
     ctx.status = 500
 

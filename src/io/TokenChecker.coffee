@@ -8,12 +8,14 @@ class TokenChecker
 
 
 TokenChecker.check = (token, ioDefine) ->
-  if !ioDefine.token
-    return
-  token = TokenModem.decode(token)
-  @checkRequire(token, ioDefine)
-  @checkType(token, ioDefine)
-  @checkExpires(token, ioDefine)
+  if token
+    token = TokenModem.decode(token)
+  if ioDefine.token
+    @checkRequire(token, ioDefine)
+    @checkType(token, ioDefine)
+    @checkExpires(token, ioDefine)
+  # @REVIEW 换个地方解码
+  return token ? {}
 
 
 

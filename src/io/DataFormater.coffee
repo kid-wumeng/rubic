@@ -6,8 +6,8 @@ class DataFormater
 
 
 
-DataFormater.format = (data={}, schema) ->
-  @formatObject(data, schema)
+DataFormater.format = (data, schema) ->
+  return @formatObject(data, schema)
 
 
 
@@ -38,8 +38,9 @@ DataFormater.formatObject = (data, schema) ->
 
 DataFormater.formatArray = (array, schema) ->
   # 只处理数组
+  # @REVIEW 临时防止undefined被格式化为空数组
   if not Array.isArray(array)
-    return []
+    return undefined
   # 遍历并格式化节点
   array = array.map (node) =>
     # 如果模式有$type属性，表示数组中应该是值节点，比如[1, 2, 3]

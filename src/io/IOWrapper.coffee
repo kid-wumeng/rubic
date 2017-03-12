@@ -16,29 +16,32 @@ IOWrapper.wrap = (ioDefine={}, dictIO) ->
 
   if io.constructor.name is 'AsyncFunction'
     return (inData={}) ->
-      ctx = IOWrapper.createContext({dictIO})
+      ctx = @
+      IOWrapper.loadContextProperties({dictIO, ctx})
       inData = DataFormater.format(inData, iSchema)
       DataChecker.check(inData, iSchema)
       outData = await io.call(ctx, inData)
       outData = DataFormater.format(outData, oSchema)
-      out = ctx.out
-      out.data = outData
-      return out
+      # @TODO 临时策略
+      outData ?= {}
+      outData.$ctx = ctx
+      return outData
   else
     return (inData={}) ->
-      ctx = IOWrapper.createContext({dictIO})
+      ctx = @
+      IOWrapper.loadContextProperties({dictIO, ctx})
       inData = DataFormater.format(inData, iSchema)
       DataChecker.check(inData, iSchema)
       outData = io.call(ctx, inData)
       outData = DataFormater.format(outData, oSchema)
-      out = ctx.out
-      out.data = outData
-      return out
+      # @TODO 临时策略
+      outData ?= {}
+      outData.$ctx = ctx
+      return outData
 
 
 
-IOWrapper.createContext = ({dictIO}) ->
-  ctx = {}
+IOWrapper.loadContextProperties = ({dictIO, ctx}) ->
   ctx.io = dictIO
   ctx.in = {}
   ctx.out = {}
@@ -46,7 +49,6 @@ IOWrapper.createContext = ({dictIO}) ->
     ctx.out.token = TokenModem.encode(type, data)
   ctx.table = (tableName) ->
     return DB.table(tableName)
-  return ctx
 
 
 

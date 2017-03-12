@@ -19,6 +19,11 @@ SchemaManager.save = (schemaDict) ->
 
 SchemaManager.formatBaseSchemaDict = () ->
   for name, schema of @dict
+    # 基本属性
+    schema.createDate = Date
+    schema.uodateDate = Date
+    schema.removeDate = Date
+    schema.restoreDate = Date
     SchemaFormater.formatLogogram(schema)
   @dict = SchemaSplicer.spliceDict(@dict)
   for name, schema of @dict

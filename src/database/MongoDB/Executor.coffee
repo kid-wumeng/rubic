@@ -37,6 +37,14 @@ Executor.prototype.findAll = (query, option) ->
 
 
 
+Executor.prototype.count = (query, option) ->
+  query.removeDate = {$exists: false}
+  return await @db
+    .collection(@tableName)
+    .count(query, option)
+
+
+
 Executor.prototype.create = (data={}) ->
   data.id = await @makeID(@tableName)
   data.createDate = new Date()

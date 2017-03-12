@@ -17,6 +17,7 @@ class DataChecker
 # $enums    {Array(*)}        枚举范围
 # $min      {Number}          Number最小值|String最小长度|Buffer最小长度|Date最小时间戳
 # $max      {Number}          Number最大值|String最大长度|Buffer最大长度|Date最大时间戳
+# $format   {String}          字符串格式，暂时只支持'email'
 # $mimes    {Array[String]}   允许的文件MIME类型，Buffer专用规则
 # $check    {Function}        开发者自己定义的规则，属性值作为参数传入，返回true/false代表是否通过
 
@@ -146,7 +147,7 @@ DataChecker.checkFormat = (key, value, rule) ->
     switch rule.$format
       when 'email'
         if not /^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$/.test(value)
-          throw "#{key}不是email"
+          throw "#{key}不是符合格式的email地址"
 
 
 

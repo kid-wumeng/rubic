@@ -28,7 +28,9 @@ class Query
         fields:
           name: 1
     ###
-    @dictOption = {}
+    @dictOption = {
+      fields: {}
+    }
 
     ###
       例子：
@@ -146,9 +148,9 @@ Query.prototype.field = (string) ->
   for name in fieldNames
     if name[0] is '-'
       name = name.slice(1)
-      _.set(@dictOption, "fields.#{name}", -1)
+      @dictOption.fields[name] = 0
     else
-      _.set(@dictOption, "fields.#{name}", 1)
+      @dictOption.fields[name] = 1
   return @
 
 
@@ -197,6 +199,13 @@ Query.prototype.fetch = () ->
     return executor.findAll(@treeQuery, @dictOption)
   else
     return executor.find(@treeQuery, @dictOption)
+
+
+
+Query.prototype.count = () ->
+  @format()
+  executor = new Executor({db: @db, tableName: @tableName})
+  return executor.count(@treeQuery, @dictOption)
 
 
 
