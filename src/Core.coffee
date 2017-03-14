@@ -1,39 +1,25 @@
-colors = require('colors')
-requireDir = require('require-dir')
-SchemaManager = require('./io/SchemaManager')
-IOManager = require('./io/IOManager')
-TokenManager = require('./io/TokenManager')
-HTTPServer = require('./net/HTTPServer')
-DB = require('./database/MongoDB/DB')
+require('colors')
+model = require('./model')
+schema = require('./schema')
+io = require('./io')
 
 
 
-class Core
-
-
-
-Core.init = (config) ->
+exports.init = (cfg) ->
   try
 
-    dictSchema = requireDir(config.dir.schema)
-    SchemaManager.save(dictSchema)
-    SchemaManager.formatBaseSchemaDict()
+    await model.init(cfg)
+    schema.init(cfg)
+    io.init(cfg)
 
-    dictIODefine = requireDir(config.dir.io)
-    IOManager.save(dictIODefine)
-    IOManager.format()
-
-    TokenManager.saveDict(config.token)
-    TokenManager.saveSecret(config.tokenSecret)
-
-    await DB.connect(config.database)
-
-    HTTPServer.listen(3000)
-    console.log 'rubic start, good luck ~'.green
+    ctx =
+      data: [77, 99]
+      token: 'kid-token'
+    await io.call('add', ctx)
+    console.log ctx.body
 
   catch error
-    console.log error
-
-
-
-module.exports = Core
+    if typeof(error) is 'string'
+      console.log error.red
+    else
+      console.log error
