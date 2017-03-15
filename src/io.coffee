@@ -6,6 +6,7 @@ model = require('./model')
 
 $ioDefineDict = {}
 $ioDict = {}
+$tokenDict = {}
 
 
 
@@ -14,11 +15,31 @@ exports.init = (cfg) ->
   @createIODefineDict(cfg)
   @formatIODefineDict()
   @createIODict()
+  @createTokenDict(cfg)
 
 
 
 exports.createIODefineDict = (cfg) ->
-  $ioDefineDict = helper.requireDir(cfg.dir.io)
+  ioDefineDict = helper.requireDir(cfg.dir.io)
+  for name, ioDefine of ioDefineDict
+    if @isPublic(name)
+      ioDefine.public = true
+      name = @formatIOName(name)
+    $ioDefineDict[name] = ioDefine
+
+
+
+exports.isPublic = (name) ->
+  index = name.lastIndexOf('.')
+  return name[index+1] is '@'
+
+
+
+exports.formatIOName = (name) ->
+  index = name.lastIndexOf('.')
+  letters = name.split('')
+  letters.splice(index+1, 1)
+  return letters.join('')
 
 
 
@@ -29,8 +50,7 @@ exports.formatIODefineDict = ->
 
 
 exports.referenceISchema = (ioDefine) ->
-  if !ioDefine.iSchema
-    ioDefine.iSchema = {}
+  ioDefine.iSchema ?= {}
   # 如果iSchema是数组，则先转为对象
   # [{...}, {...}] => {'0': {...}, '1': {...}}
   if Array.isArray(ioDefine.iSchema)
@@ -47,6 +67,11 @@ exports.referenceISchema = (ioDefine) ->
 exports.createIODict = ->
   for name, ioDefine of $ioDefineDict
     $ioDict[name] = @wrap(ioDefine)
+
+
+
+exports.createTokenDict = (cfg) ->
+  $tokenDict = cfg.token ? {}
 
 
 
@@ -69,18 +94,39 @@ exports.wrap = (ioDefine) ->
 # 外部请求时才使用本方法
 # io内的互调直接使用@io.xxx()即可
 exports.call = (name, ctx) ->
+  ioDefine = $ioDefineDict[name]
+  if !ioDefine
+    throw "IO call error: io '#{name}' is not found."
+  if !ioDefine.public
+    throw "IO call error: io '#{name}' is not public."
+  @checkToken(ctx, ioDefine)
   @readyContext(ctx)
   io = ctx.io[name]
-  data = ctx.data
   # @REVIEW 暂时只在外部请求调用时验证规则，是否需要有个可选项，扩展到每次调用？
   iSchema = $ioDefineDict[name].iSchema
-  schema.check(iSchema, data)
+  ctx.data = schema.filter(iSchema, ctx.data)
+  data = ctx.data
+  await schema.check(iSchema, data)
   # 举例：@call('findBook', ['john'])
   if Array.isArray(data)
     await io(data...)
   # 举例：@call('findBook', {author: 'john'})
   else
     await io(data)
+
+
+
+exports.checkToken = (ctx, ioDefine) ->
+  if ioDefine.token
+    if !ctx.token
+      throw "Token check error: lack token."
+    type = ctx.token.$type
+    if !ioDefine.token[type]
+      throw "Token check error: is not allowed token type."
+    expires = ctx.token.$type
+    if expires < Date.now()
+      # @TODO 过期处理
+      throw "Token check error: token has expired."
 
 
 
@@ -94,3 +140,15 @@ exports.readyContext = (ctx) ->
     ctx.io[name] = io.bind(ctx)
   # 挂载模型表
   ctx.model = model.getModelDict()
+  # 挂载工具方法
+  ctx.signToken = @signToken.bind(ctx)
+
+
+
+exports.signToken = (type, payload={}) ->
+  if !$tokenDict[type]
+    throw "Token sign error: token's type '#{type}' is not found in config."
+  days = $tokenDict[type]
+  @tokenSigned = payload
+  @tokenSigned.$type = type
+  @tokenSigned.$expires = Date.now() + parseInt(days * 24 * 60 * 60 * 1000)

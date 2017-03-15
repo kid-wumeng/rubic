@@ -1,4 +1,5 @@
 _ = require('lodash')
+fileType = require('file-type')
 helper = require('./helper')
 
 
@@ -183,6 +184,15 @@ exports.referenceSchema = (schema, key, refSchema) ->
 
 
 
+exports.filter = (schema, data) ->
+  dataFiltered = {}
+  for key, rule of schema
+    value = _.get(data, key)
+    _.set(dataFiltered, key, value)
+  return dataFiltered
+
+
+
 # 规则集
 # default {Boolean}         默认值，设置为null或undefined是没意义的
 # must    {Boolean}         必要性
@@ -208,6 +218,7 @@ exports.checkValue = (rule, key, value) ->
     when Boolean then @checkBoolean(rule, key, value)
     when Number then @checkNumber(rule, key, value)
     when String then @checkString(rule, key, value)
+    when Buffer then @checkBuffer(rule, key, value)
     when Date then @checkDate(rule, key, value)
   @checkCustom(rule, key, value)
 
@@ -269,7 +280,22 @@ exports.checkString = (rule, key, value) ->
 
 
 
+exports.checkBuffer = (rule, key, value) ->
+  if !(value instanceof Buffer)
+    throw "Data check error: '#{key}' should be a Buffer ( File in front-end )."
+  mime = fileType(value).mime
+  if rule.mime and !rule.mime.includes(mime)
+    throw "Data check error: mime of file '#{key}' should be in [#{rule.mime.join(', ')}]."
+  min = rule.min ? -Infinity
+  if value.length < min
+    throw "Data check error: size of file '#{key}' should be >= #{min/1024} kb."
+  max = rule.max ? Infinity
+  if value.length > max
+    throw "Data check error: size of file '#{key}' should be <= #{max/1024} kb."
+
+
+
 exports.checkDate = (rule, key, value) ->
   if !(value instanceof Date)
     throw "Data check error: '#{key}' should be a Date."
-  # enum，min，max验证
+  # @TODO enum，min，max验证

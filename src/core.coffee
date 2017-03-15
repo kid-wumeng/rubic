@@ -2,24 +2,24 @@ require('colors')
 model = require('./model')
 schema = require('./schema')
 io = require('./io')
+net = require('./net')
 
 
 
 exports.init = (cfg) ->
   try
-
     await model.init(cfg)
     schema.init(cfg)
     io.init(cfg)
-
-    ctx =
-      data: [77, 99]
-      token: 'kid-token'
-    await io.call('add', ctx)
-    console.log ctx.body
-
+    net.init(cfg)
+    console.log 'rubic start, good luck everybody ~'.green
   catch error
-    if typeof(error) is 'string'
-      console.log error.red
-    else
-      console.log error
+    @handleError(error)
+
+
+
+exports.handleError = (error) ->
+  if typeof(error) is 'string'
+    console.log error.red
+  else
+    console.log error

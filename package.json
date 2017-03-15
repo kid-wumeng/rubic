@@ -1,6 +1,9 @@
 {
   "name": "Mars",
   "version": "0.1.0",
+  "scripts": {
+    "build-client": "coffee --output lib --compile src/client.coffee"
+  },
   "dependencies": {
     "async-busboy": "^0.3.4",
     "co": "^4.6.0",
