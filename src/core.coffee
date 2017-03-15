@@ -8,11 +8,14 @@ net = require('./net')
 
 exports.init = (cfg) ->
   try
+
     await model.init(cfg)
     schema.init(cfg)
     io.init(cfg)
     net.init(cfg)
+
     console.log 'rubic start, good luck everybody ~'.green
+
   catch error
     @handleError(error)
 

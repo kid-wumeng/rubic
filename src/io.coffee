@@ -1,3 +1,4 @@
+_ = require('lodash')
 helper = require('./helper')
 schema = require('./schema')
 model = require('./model')
@@ -46,6 +47,7 @@ exports.formatIOName = (name) ->
 exports.formatIODefineDict = ->
   for name, ioDefine of $ioDefineDict
     @referenceISchema(ioDefine)
+    schema.handleArrayRules(ioDefine.iSchema)
 
 
 
@@ -116,13 +118,22 @@ exports.call = (name, ctx) ->
 
 
 
+###
+  check the token validity.
+
+  @param {Object} ctx
+  @param {Object} ioDefine
+###
+
 exports.checkToken = (ctx, ioDefine) ->
   if ioDefine.token
     if !ctx.token
       throw "Token check error: lack token."
+
     type = ctx.token.$type
     if !ioDefine.token[type]
       throw "Token check error: is not allowed token type."
+
     expires = ctx.token.$type
     if expires < Date.now()
       # @TODO 过期处理
@@ -130,25 +141,41 @@ exports.checkToken = (ctx, ioDefine) ->
 
 
 
-# ctx本身是koa的中间件上下文，但会挂载一部分rubic的属性和方法
-# 无论调用链如何复杂，一次请求/响应之间的io们都共享同一个ctx
-# ctx.data属性始终是请求数据（除非开发者修改）
+###
+  ctx本身是koa的中间件上下文，但会挂载一部分rubic的属性和方法
+  无论调用链如何复杂，一次请求/响应之间的io们都共享同一个ctx
+  ctx.data属性始终是请求数据（除非开发者修改）
+
+  @param {Object} ctx
+###
+
 exports.readyContext = (ctx) ->
-  # 挂载绑定了上下文的io表
-  ctx.io = {}
-  for name, io of $ioDict
-    ctx.io[name] = io.bind(ctx)
-  # 挂载模型表
+  # bind ctx to each io.
+  ctx.io = _.mapValues $ioDict, (io) -> io.bind(ctx)
+
   ctx.model = model.getModelDict()
-  # 挂载工具方法
+
   ctx.signToken = @signToken.bind(ctx)
 
 
 
+###
+sign a token to response.
+there is valid only of the last call in io-chain.
+@param {string} type - such as 'user', 'admin', ... config by user
+@param {Object} payload - data from user.
+###
+
 exports.signToken = (type, payload={}) ->
-  if !$tokenDict[type]
+  # $type: must in config.yml
+  if not $tokenDict[type]
     throw "Token sign error: token's type '#{type}' is not found in config."
+  payload.$type = type
+
+  # $expires: a timestamp in the future
   days = $tokenDict[type]
+  milliSeconds = parseInt(days * 24 * 60 * 60 * 1000)
+  expires = Date.now() + milliSeconds
+  payload.$expires = expires
+
   @tokenSigned = payload
-  @tokenSigned.$type = type
-  @tokenSigned.$expires = Date.now() + parseInt(days * 24 * 60 * 60 * 1000)

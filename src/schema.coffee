@@ -184,11 +184,43 @@ exports.referenceSchema = (schema, key, refSchema) ->
 
 
 
+exports.handleArrayRules = (schema) ->
+  for key, rule of schema
+    if key.indexOf('$') > -1
+      @handleArrayRule(key, rule)
+
+
+
+exports.handleArrayRule = (key, rule) ->
+  # for example,
+  # key = 'post.comments.$.replies.$.content'
+
+  # parts = ['post.comments', 'replies', 'content']
+  parts = key.split('.$.')
+
+  # item = 'content'
+  item = parts.pop()
+
+  # arrays = ['post.comments', 'replies']
+  arrays = parts
+
+  rule.valueInArray = true
+  rule.arrays = arrays
+  rule.item = item
+
+
+
 exports.filter = (schema, data) ->
   dataFiltered = {}
   for key, rule of schema
-    value = _.get(data, key)
-    _.set(dataFiltered, key, value)
+    if rule.valueInArray is true
+      items = @getItemsInArray(rule, data)
+      for item in items
+        {key, value} = item
+        _.set(dataFiltered, key, value)
+    else
+      value = _.get(data, key)
+      _.set(dataFiltered, key, value)
   return dataFiltered
 
 
@@ -205,8 +237,61 @@ exports.filter = (schema, data) ->
 # check   {Function}        开发者自己定义的规则，属性值作为参数传入，返回true/false代表是否通过
 exports.check = (schema, data) ->
   for key, rule of schema
-    value = _.get(data, key)
-    @checkValue(rule, key, value)
+    if rule.valueInArray is true
+      items = @getItemsInArray(rule, data)
+      for item in items
+        {key, value} = item
+        @checkValue(rule, key, value)
+    else
+      value = _.get(data, key)
+      @checkValue(rule, key, value)
+
+
+
+exports.getItemsInArray = (rule, data) ->
+  ###
+  @example
+  rule.arrays = ['post.comments', 'replies']
+  rule.item = 'content'
+  data =
+    post:
+      comments: [{
+        content: 'c1'
+        replies: [{content: 'r1'},{content: 'r2'}]
+      },{
+        content: 'c2'
+        replies: [{content: 'r3'},{content: 'r4'}]
+      }]
+  ###
+
+  arrayKeys = rule.arrays
+  itemKey = rule.item
+  deepMax = arrayKeys.length
+  deep = 0
+  cursor = []
+  items = []
+
+  fn = (node) ->
+    if deep is deepMax
+      items.push({
+        key: "#{cursor.join('.')}.#{itemKey}"
+        value: _.get(node, itemKey)
+      })
+      return
+
+    key = arrayKeys[deep]
+    children = _.get(node, key)
+    deep++
+    cursor.push(key)
+    for child, i in children
+      cursor.push(i)
+      fn(child)
+      cursor.pop()
+    cursor.pop()
+    deep--
+
+  fn(data)
+  return items
 
 
 
