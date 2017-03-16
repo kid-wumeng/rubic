@@ -203,7 +203,7 @@ exports.handleArrayRule = (key, rule) ->
   # key = 'post.comments.$.replies.$.content'
 
   # parts = ['post.comments', 'replies', 'content']
-  parts = key.split('.$.')
+  parts = key.split(/\.\$\.?/)
 
   # itemKey = 'content'
   itemKey = parts.pop()
@@ -286,14 +286,19 @@ exports.getItemsInArray = (rule, data) ->
 
   fn = (node) ->
     if deep is deepMax
-      items.push({
-        key: "#{cursor.join('.')}.#{itemKey}"
-        value: _.get(node, itemKey)
-      })
+      if itemKey
+        key = "#{cursor.join('.')}.#{itemKey}"
+        value = _.get(node, itemKey)
+      else
+        key = cursor.join('.')
+        value = node
+      items.push({key, value})
       return
 
     key = arrayKeys[deep]
     children = _.get(node, key)
+    if !children
+      return
     deep++
     cursor.push(key)
     for child, i in children

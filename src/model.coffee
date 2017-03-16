@@ -92,6 +92,7 @@ exports.createSchema = (define) ->
   schema.updateDate = {type: Date}
   schema.removeDate = {type: Date}
   schema.restoreDate = {type: Date}
+  Schema.handleArrayRules(schema)
   return schema
 
 
@@ -111,6 +112,10 @@ exports.findOne = (model, query, opt) ->
 
   data = await $db.collection(collection).findOne(query, opt)
   data = Schema.filter(schema, data)
+
+  if opt.join
+    await @findOneJoin({model, data, opt})
+
   return data
 
 
@@ -125,6 +130,10 @@ exports.find = (model, query, opt) ->
 
   datas = await $db.collection(collection).find(query, opt).toArray()
   datas = datas.map (data) -> Schema.filter(schema, data)
+
+  if opt.join
+    await @findJoin({model, datas, opt})
+
   return datas
 
 
@@ -257,3 +266,89 @@ exports.formatModifier = (modifier={}) ->
   # @TODO 在$inc等修改器中也限制对id的修改（是否报错？）
   delete modifier.$set['id']
   return modifier
+
+
+
+exports.findOneJoin = ({model, data, opt}) ->
+  for key, fields of opt.join
+    rule = model.schema[key]
+    joinModel = $modelDict[rule.join]
+    joinData = _.get(data, key)
+    if Array.isArray(joinData)
+      joinDatas = joinData
+      joinIDs = joinDatas.map (data) -> data.id
+      joinDatas = await @find(joinModel, {
+        id: {$in: joinIDs}
+      },{
+        fields: @formatFields(fields)
+      })
+      _.set(data, key, joinDatas)
+    else
+      joinID = joinData.id
+      joinData = await @findOne(joinModel, {
+        id: joinID
+      },{
+        fields: @formatFields(fields)
+      })
+      _.set(data, key, joinData)
+
+
+
+exports.findJoin = ({model, datas, opt}) ->
+  ###
+  @example
+  cast = await @model.Book.find({}, {
+    join:
+      'author': 'name'
+  })
+  ###
+  for key, fields of opt.join
+    rule = model.schema[key]
+    joinModel = $modelDict[rule.join]
+    allIDs = []
+    for data in datas
+      joinData = _.get(data, key)
+      if Array.isArray(joinData)
+        joinDatas = joinData
+        for joinData in joinDatas
+          allIDs.push(joinData.id)
+      else
+        allIDs.push(joinData.id)
+    allIDs = _.uniq(allIDs)
+    joinDatas = await @find(joinModel, {
+      id: {$in: allIDs}
+    },{
+      fields: @formatFields(fields)
+    })
+    joinDataDict = {}
+    for joinData in joinDatas
+      joinDataDict[joinData.id] = joinData
+    # 分配到各data中
+    for data in datas
+      joinData = _.get(data, key)
+      if Array.isArray(joinData)
+        joinDatas = joinData
+        joinDatas = joinDatas.map (joinData) -> joinDataDict[joinData.id]
+        _.set(data, key, joinDatas)
+      else
+        joinData = joinDataDict[joinData.id]
+        _.set(data, key, joinData)
+
+
+
+exports.formatFields = (fields) ->
+  if fields is true
+    return {}
+  fields = fields.split(/\s+/)
+  fieldDict = {}
+  isPick = false
+  for field in fields
+    if field[0] is '-'
+      field = field.slice(1)
+      fieldDict[field] = 0
+    else
+      isPick = true
+      fieldDict[field] = 1
+  if isPick
+    fieldDict.id = 1
+  return fieldDict
