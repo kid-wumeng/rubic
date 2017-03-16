@@ -52,17 +52,17 @@ exports.formatIODefineDict = ->
 
 
 exports.referenceISchema = (ioDefine) ->
-  ioDefine.iSchema ?= {}
-  # 如果iSchema是数组，则先转为对象
-  # [{...}, {...}] => {'0': {...}, '1': {...}}
-  if Array.isArray(ioDefine.iSchema)
-    iSchemaObject = {}
-    for item, i in ioDefine.iSchema
-      iSchemaObject[i] = item
-    ioDefine.iSchema = iSchemaObject
-  # 遍历处理规则的引用
-  for key, rule of ioDefine.iSchema
-    schema.reference(ioDefine.iSchema, key)
+  if ioDefine.iSchema
+    # 如果iSchema是数组，则先转为对象
+    # [{...}, {...}] => {'0': {...}, '1': {...}}
+    if Array.isArray(ioDefine.iSchema)
+      iSchemaObject = {}
+      for item, i in ioDefine.iSchema
+        iSchemaObject[i] = item
+      ioDefine.iSchema = iSchemaObject
+    # 遍历处理规则的引用
+    for key, rule of ioDefine.iSchema
+      schema.reference(ioDefine.iSchema, key)
 
 
 
@@ -106,7 +106,8 @@ exports.call = (name, ctx) ->
   io = ctx.io[name]
   # @REVIEW 暂时只在外部请求调用时验证规则，是否需要有个可选项，扩展到每次调用？
   iSchema = $ioDefineDict[name].iSchema
-  ctx.data = schema.filter(iSchema, ctx.data)
+  if iSchema
+    ctx.data = schema.filter(iSchema, ctx.data)
   data = ctx.data
   await schema.check(iSchema, data)
   # 举例：@call('findBook', ['john'])
