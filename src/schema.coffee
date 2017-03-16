@@ -95,6 +95,13 @@ exports.distillSchema = (schemaKey) ->
 
 
 
+exports.getSchema = (name) ->
+  schema = $schemaDict[name]
+  return Object.assign({}, schema)
+
+
+
+
 ###
   本方法专门用于IO模式的引用
 
@@ -198,29 +205,33 @@ exports.handleArrayRule = (key, rule) ->
   # parts = ['post.comments', 'replies', 'content']
   parts = key.split('.$.')
 
-  # item = 'content'
-  item = parts.pop()
+  # itemKey = 'content'
+  itemKey = parts.pop()
 
-  # arrays = ['post.comments', 'replies']
-  arrays = parts
+  # arrayKeys = ['post.comments', 'replies']
+  arrayKeys = parts
 
   rule.valueInArray = true
-  rule.arrays = arrays
-  rule.item = item
+  rule.arrayKeys = arrayKeys
+  rule.itemKey = itemKey
 
 
 
 exports.filter = (schema, data) ->
+  if typeof(schema) is 'string'
+    schema = $schemaDict[schema]
   dataFiltered = {}
   for key, rule of schema
     if rule.valueInArray is true
       items = @getItemsInArray(rule, data)
       for item in items
         {key, value} = item
-        _.set(dataFiltered, key, value)
+        if value
+          _.set(dataFiltered, key, value)
     else
       value = _.get(data, key)
-      _.set(dataFiltered, key, value)
+      if value
+        _.set(dataFiltered, key, value)
   return dataFiltered
 
 
@@ -236,6 +247,8 @@ exports.filter = (schema, data) ->
 # mimes   {Array[String]}   允许的文件MIME类型，Buffer专用规则
 # check   {Function}        开发者自己定义的规则，属性值作为参数传入，返回true/false代表是否通过
 exports.check = (schema, data) ->
+  if typeof(schema) is 'string'
+    schema = $schemaDict[schema]
   for key, rule of schema
     if rule.valueInArray is true
       items = @getItemsInArray(rule, data)
@@ -251,8 +264,8 @@ exports.check = (schema, data) ->
 exports.getItemsInArray = (rule, data) ->
   ###
   @example
-  rule.arrays = ['post.comments', 'replies']
-  rule.item = 'content'
+  rule.arrayKeys = ['post.comments', 'replies']
+  rule.itemKey = 'content'
   data =
     post:
       comments: [{
@@ -264,8 +277,8 @@ exports.getItemsInArray = (rule, data) ->
       }]
   ###
 
-  arrayKeys = rule.arrays
-  itemKey = rule.item
+  arrayKeys = rule.arrayKeys
+  itemKey = rule.itemKey
   deepMax = arrayKeys.length
   deep = 0
   cursor = []
@@ -352,11 +365,11 @@ exports.checkString = (rule, key, value) ->
       throw "Data check error: '#{key}' should be in [#{rule.enum.join(', ')}]."
   min = rule.min ? -Infinity
   # @TODO countChar
-  if value.length < min
+  if helper.countCharByWidth(value) < min
     throw "Data check error: length of '#{key}' should be >= #{min}."
   max = rule.max ? Infinity
   # @TODO countChar
-  if value.length > max
+  if helper.countCharByWidth(value) > max
     throw "Data check error: length of '#{key}' should be <= #{max}."
   switch rule.format
     when 'email'

@@ -35,3 +35,12 @@ exports.traverseDir = (dirPath, callback) ->
 
 exports.isEmailAddress = (value) ->
   return /^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$/.test(value)
+
+
+
+exports.countCharByWidth = (string) ->
+  count = 0
+  for char, i in string
+    code = string.charCodeAt(i)
+    count += if code <= 255 then 1 else 2
+  return count

@@ -1,5 +1,6 @@
 _ = require('lodash')
 mongodb = require('mongodb')
+Schema = require('./schema')
 
 
 
@@ -69,17 +70,29 @@ exports.createModelDict = (cfg) ->
 
 
 exports.createModel = (define) ->
-  collection = define.collection
   model = {}
-  model.findOne = (args...) => @findOne(collection, args...)
-  model.find = (args...) => @find(collection, args...)
-  model.count = (args...) => @count(collection, args...)
-  model.create = (args...) => @create(collection, args...)
-  model.update = (args...) => @update(collection, args...)
-  model.remove = (args...) => @remove(collection, args...)
-  model.restore = (args...) => @restore(collection, args...)
-  model.delete = (args...) => @delete(collection, args...)
+  model.collection = define.collection
+  model.schema = @createSchema(define)
+  model.findOne = (args...) => @findOne(model, args...)
+  model.find = (args...) => @find(model, args...)
+  model.count = (args...) => @count(model, args...)
+  model.create = (args...) => @create(model, args...)
+  model.update = (args...) => @update(model, args...)
+  model.remove = (args...) => @remove(model, args...)
+  model.restore = (args...) => @restore(model, args...)
+  model.delete = (args...) => @delete(model, args...)
   return model
+
+
+
+exports.createSchema = (define) ->
+  schema = Schema.getSchema(define.schema)
+  schema.id = {type: Number}
+  schema.createDate = {type: Date}
+  schema.updateDate = {type: Date}
+  schema.removeDate = {type: Date}
+  schema.restoreDate = {type: Date}
+  return schema
 
 
 
@@ -89,34 +102,55 @@ exports.getModelDict = ->
 
 
 # @RETURN {object/null}
-exports.findOne = (collection, query, opt) ->
-  @formatQuery(query)
-  @formatQueryOpt(opt)
-  return await $db.collection(collection).findOne(query, opt)
+exports.findOne = (model, query, opt) ->
+  collection = model.collection
+  schema = model.schema
+
+  query = @formatQuery(query)
+  opt = @formatQueryOpt(model, opt)
+
+  data = await $db.collection(collection).findOne(query, opt)
+  data = Schema.filter(schema, data)
+  return data
 
 
 
 # @RETURN {array[object]}
-exports.find = (collection, query, opt) ->
-  @formatQuery(query)
-  @formatQueryOpt(opt)
-  return await $db.collection(collection).find(query, opt).toArray()
+exports.find = (model, query, opt) ->
+  collection = model.collection
+  schema = model.schema
+
+  query = @formatQuery(query)
+  opt = @formatQueryOpt(model, opt)
+
+  datas = await $db.collection(collection).find(query, opt).toArray()
+  datas = datas.map (data) -> Schema.filter(schema, data)
+  return datas
 
 
 
 # @RETURN {number}
-exports.count = (collection, query, opt) ->
-  @formatQuery(query)
-  @formatQueryOpt(opt)
+exports.count = (model, query, opt) ->
+  collection = model.collection
+  query = @formatQuery(query)
+  opt = @formatQueryOpt(model, opt)
   return await $db.collection(collection).count(query, opt)
 
 
 
-exports.create = (collection, data) ->
+exports.create = (model, data) ->
+  collection = model.collection
+  schema = model.schema
+
   if not _.isPlainObject(data)
     throw "DB write error: @model('#{collection}').create(data), data should be an plain-object."
+
+  data = Schema.filter(schema, data)
+  Schema.check(schema, data)
+
   data.id = await @createID(collection)
   data.createDate = new Date()
+
   result = await $db.collection(collection).insertOne(data)
   return true
   # @TODO 支持model规则时再启动返回值（主要是为了private属性的处理）
@@ -125,9 +159,12 @@ exports.create = (collection, data) ->
 
 
 # @RETURN {object}
-exports.update = (collection, query, modifier) ->
-  @formatQuery(query)
-  @formatModifier(modifier)
+exports.update = (model, query, modifier) ->
+  collection = model.collection
+  schema = model.schema
+
+  query = @formatQuery(query)
+  modifier = @formatModifier(modifier)
   opt = {returnOriginal: false}
   result = await $db.collection(collection).findOneAndUpdate(query, modifier, opt)
   return true
@@ -136,8 +173,10 @@ exports.update = (collection, query, modifier) ->
 
 
 
-exports.remove = (collection, query) ->
-  @formatQuery(query)
+exports.remove = (model, query) ->
+  collection = model.collection
+
+  query = @formatQuery(query)
   modifier = {
     $set: {removeDate: new Date()}
   }
@@ -146,7 +185,8 @@ exports.remove = (collection, query) ->
 
 
 
-exports.restore = (collection, query) ->
+exports.restore = (model, query) ->
+  collection = model.collection
   modifier = {
     $unset: {removeDate: ''}
     $set: {restoreDate: new Date()}
@@ -159,7 +199,8 @@ exports.restore = (collection, query) ->
 
 
 
-exports.delete = (collection, query) ->
+exports.delete = (model, query) ->
+  collection = model.collection
   await $db.collection(collection).deleteOne(query)
   return null
 
@@ -181,16 +222,27 @@ exports.createID = (collection) ->
 
 exports.formatQuery = (query={}) ->
   query.removeDate = {$exists: false}
+  return query
 
 
 
-exports.formatQueryOpt = (opt={}) ->
+exports.formatQueryOpt = (model, opt={}) ->
   opt.page ?= 1
   opt.size ?= 0
   opt.skip = (opt.page - 1) * opt.size
   opt.limit = opt.size
   delete opt.page
   delete opt.size
+
+  opt.fields ?= {}
+  values = _.values(opt.fields)
+  isOmit = (values.length is 0) or (values[0] is 0)
+  if isOmit
+    for key, rule of model.schema
+      if rule.private
+        opt.fields[key] = 0
+
+  return opt
 
 
 
@@ -204,3 +256,4 @@ exports.formatModifier = (modifier={}) ->
       delete modifier[key]
   # @TODO 在$inc等修改器中也限制对id的修改（是否报错？）
   delete modifier.$set['id']
+  return modifier
