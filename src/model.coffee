@@ -107,14 +107,18 @@ exports.findOne = (model, query, opt) ->
   collection = model.collection
   schema = model.schema
 
+  if typeof(query) is 'number'
+    query = {id: query}
+
   query = @formatQuery(query)
   opt = @formatQueryOpt(model, opt)
 
   data = await $db.collection(collection).findOne(query, opt)
-  data = Schema.filter(schema, data)
 
-  if opt.join
-    await @findOneJoin({model, data, opt})
+  if data
+    data = Schema.filter(schema, data)
+    if opt.join
+      await @findOneJoin({model, data, opt})
 
   return data
 
@@ -129,10 +133,12 @@ exports.find = (model, query, opt) ->
   opt = @formatQueryOpt(model, opt)
 
   datas = await $db.collection(collection).find(query, opt).toArray()
-  datas = datas.map (data) -> Schema.filter(schema, data)
 
-  if opt.join
-    await @findJoin({model, datas, opt})
+  if datas.length
+    datas = datas.map (data) ->
+      Schema.filter(schema, data)
+    if opt.join
+      await @findJoin({model, datas, opt})
 
   return datas
 
@@ -161,9 +167,8 @@ exports.create = (model, data) ->
   data.createDate = new Date()
 
   result = await $db.collection(collection).insertOne(data)
-  return true
-  # @TODO 支持model规则时再启动返回值（主要是为了private属性的处理）
-  # return result.ops[0]
+  # @TODO 支持model规则时（主要是为了private属性的处理）
+  return result.ops[0]
 
 
 
@@ -172,18 +177,22 @@ exports.update = (model, query, modifier) ->
   collection = model.collection
   schema = model.schema
 
+  modifier = Schema.filter(schema, modifier)
+
   query = @formatQuery(query)
   modifier = @formatModifier(modifier)
   opt = {returnOriginal: false}
   result = await $db.collection(collection).findOneAndUpdate(query, modifier, opt)
-  return true
-  # @TODO 支持model规则时再启动返回值（主要是为了private属性的处理）
-  # return result.value
+  # @TODO 支持model规则（主要是为了private属性的处理）
+  return result.value
 
 
 
 exports.remove = (model, query) ->
   collection = model.collection
+
+  if typeof(query) is 'number'
+    query = {id: query}
 
   query = @formatQuery(query)
   modifier = {
@@ -196,20 +205,27 @@ exports.remove = (model, query) ->
 
 exports.restore = (model, query) ->
   collection = model.collection
+
+  if typeof(query) is 'number'
+    query = {id: query}
+
   modifier = {
     $unset: {removeDate: ''}
     $set: {restoreDate: new Date()}
   }
   option = {returnOriginal: false}
   result = await $db.collection(collection).findOneAndUpdate(query, modifier, option)
-  return true
-  # @TODO 支持model规则时再启动返回值（主要是为了private属性的处理）
-  # return result.value
+  # @TODO 支持model规则（主要是为了private属性的处理）
+  return result.value
 
 
 
 exports.delete = (model, query) ->
   collection = model.collection
+
+  if typeof(query) is 'number'
+    query = {id: query}
+
   await $db.collection(collection).deleteOne(query)
   return null
 
@@ -283,7 +299,7 @@ exports.findOneJoin = ({model, data, opt}) ->
         fields: @formatFields(fields)
       })
       _.set(data, key, joinDatas)
-    else
+    else if _.isPlainObject(joinData)
       joinID = joinData.id
       joinData = await @findOne(joinModel, {
         id: joinID
@@ -312,7 +328,7 @@ exports.findJoin = ({model, datas, opt}) ->
         joinDatas = joinData
         for joinData in joinDatas
           allIDs.push(joinData.id)
-      else
+      else if _.isPlainObject(joinData)
         allIDs.push(joinData.id)
     allIDs = _.uniq(allIDs)
     joinDatas = await @find(joinModel, {
@@ -330,7 +346,7 @@ exports.findJoin = ({model, datas, opt}) ->
         joinDatas = joinData
         joinDatas = joinDatas.map (joinData) -> joinDataDict[joinData.id]
         _.set(data, key, joinDatas)
-      else
+      else if _.isPlainObject(joinData)
         joinData = joinDataDict[joinData.id]
         _.set(data, key, joinData)
 

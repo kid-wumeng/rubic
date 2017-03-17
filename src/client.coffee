@@ -95,10 +95,8 @@ core.call = (ioName, data={}) ->
 
 core.onReadyStateChange = ->
   if @xhr.readyState is XMLHttpRequest.DONE
-    if @xhr.status is 200
+    if @xhr.status is 200 or @xhr.status is 204
       core.handleSuccess(@xhr, @resolve)
-    else if @xhr.status is 204
-      @resolve({})
     else
       core.handleFailure(@xhr, @reject)
 
@@ -132,24 +130,22 @@ core.handleFailure = (xhr, reject) ->
 
 
 
-core.set = (object, key, value) ->
+core.set = (data, key, value) ->
   names = key.split('.')
+  last = names.pop()
   for name, i in names
-    nextName = names[i+1]
-    if /^\d+$/.test(nextName)
-      if !(object[name] instanceof Array)
-        object[name] = []
-    else
-      if typeof(object[name]) isnt 'object'
-        if nextName
-          object[name] = {}
-          object = object[name]
-  lastName = names[names.length-1]
-  object[lastName] = value
+    if data[name] is undefined
+      next = names[i+1]
+      if /^\d+$/.test(next)
+        data[name] = []
+      else
+        data[name] = {}
+    data = data[name]
+  data[last] = value
 
 
 
-if window
-  window.rubic = core
-else
+if typeof(module isnt undefined)
   global.rubic = core
+else
+  window.rubic = core

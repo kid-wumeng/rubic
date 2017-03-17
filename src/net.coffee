@@ -94,6 +94,8 @@ exports.splitData = (ctx) ->
       jsonDict[cursor.join('.')] = node
     else if node instanceof Date
       dateDict[cursor.join('.')] = node.getTime()
+    else if Array.isArray(node) and node.length is 0
+      jsonDict[cursor.join('.')] = []
     else
       for name of node
         cursor.push(name)
@@ -124,3 +126,5 @@ exports.decodeToken = (ctx) ->
     if !$tokenSecret
       throw "Token decode error: secret is not found."
     ctx.token = jwt.decode(token, $tokenSecret)
+  else
+    ctx.token = {}

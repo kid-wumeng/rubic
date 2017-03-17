@@ -193,8 +193,10 @@ exports.referenceSchema = (schema, key, refSchema) ->
 
 exports.handleArrayRules = (schema) ->
   for key, rule of schema
+    rule = Object.assign({}, rule)
     if key.indexOf('$') > -1
       @handleArrayRule(key, rule)
+      schema[key] = rule
 
 
 
@@ -218,19 +220,21 @@ exports.handleArrayRule = (key, rule) ->
 
 
 exports.filter = (schema, data) ->
-  if typeof(schema) is 'string'
-    schema = $schemaDict[schema]
   dataFiltered = {}
   for key, rule of schema
     if rule.valueInArray is true
+      if rule.join
+        continue
       items = @getItemsInArray(rule, data)
       for item in items
         {key, value} = item
-        if value
+        value ?= rule.default
+        if value isnt null and value isnt undefined
           _.set(dataFiltered, key, value)
     else
       value = _.get(data, key)
-      if value
+      value ?= rule.default
+      if value isnt null and value isnt undefined
         _.set(dataFiltered, key, value)
   return dataFiltered
 
@@ -247,8 +251,6 @@ exports.filter = (schema, data) ->
 # mimes   {Array[String]}   允许的文件MIME类型，Buffer专用规则
 # check   {Function}        开发者自己定义的规则，属性值作为参数传入，返回true/false代表是否通过
 exports.check = (schema, data) ->
-  if typeof(schema) is 'string'
-    schema = $schemaDict[schema]
   for key, rule of schema
     if rule.valueInArray is true
       items = @getItemsInArray(rule, data)
@@ -369,11 +371,9 @@ exports.checkString = (rule, key, value) ->
     if !rule.enum.includes(value)
       throw "Data check error: '#{key}' should be in [#{rule.enum.join(', ')}]."
   min = rule.min ? -Infinity
-  # @TODO countChar
   if helper.countCharByWidth(value) < min
     throw "Data check error: length of '#{key}' should be >= #{min}."
   max = rule.max ? Infinity
-  # @TODO countChar
   if helper.countCharByWidth(value) > max
     throw "Data check error: length of '#{key}' should be <= #{max}."
   switch rule.format
