@@ -1,4 +1,5 @@
 require('colors')
+redis = require('./redis')
 schema = require('./schema')
 io = require('./io')
 model = require('./model')
@@ -9,6 +10,7 @@ net = require('./net')
 exports.init = (cfg) ->
   try
 
+    await redis.init(cfg)
     schema.init(cfg)
     io.init(cfg)
     await model.init(cfg)

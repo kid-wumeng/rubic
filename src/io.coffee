@@ -2,6 +2,7 @@ _ = require('lodash')
 helper = require('./helper')
 schema = require('./schema')
 model = require('./model')
+redis = require('./redis')
 
 
 
@@ -103,7 +104,7 @@ exports.call = (name, ctx) ->
     throw "IO call error: io '#{name}' is not public."
   @checkToken(ctx, ioDefine)
   @readyContext(ctx)
-  io = ctx.io[name]
+  io = _.get(ctx.io, name)
   # @REVIEW 暂时只在外部请求调用时验证规则，是否需要有个可选项，扩展到每次调用？
   iSchema = $ioDefineDict[name].iSchema
   if iSchema
@@ -152,9 +153,14 @@ exports.checkToken = (ctx, ioDefine) ->
 
 exports.readyContext = (ctx) ->
   # bind ctx to each io.
-  ctx.io = _.mapValues $ioDict, (io) -> io.bind(ctx)
+  ctx.io = {}
+  for name, io of $ioDict
+    io = io.bind(ctx)
+    _.set(ctx.io, name, io)
 
   ctx.model = model.getModelDict()
+
+  ctx.redis = redis.client()
 
   ctx.signToken = @signToken.bind(ctx)
 

@@ -246,6 +246,7 @@ exports.createID = (collection) ->
 
 
 exports.formatQuery = (query={}) ->
+  query = Object.assign({}, query)
   query.removeDate = {$exists: false}
   return query
 

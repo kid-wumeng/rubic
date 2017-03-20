@@ -20,6 +20,10 @@ exports.init = (cfg) ->
 
 exports.createSchemaDict = (cfg) ->
   $schemaDict = helper.requireDir(cfg.dir.schema)
+  for name, schema of $schemaDict
+    schema.id =
+      type: Number
+      must: true
 
 
 
@@ -228,15 +232,22 @@ exports.filter = (schema, data) ->
       items = @getItemsInArray(rule, data)
       for item in items
         {key, value} = item
-        value ?= rule.default
-        if value isnt null and value isnt undefined
+        value = @filterEach(rule, value)
+        if value isnt null
           _.set(dataFiltered, key, value)
     else
       value = _.get(data, key)
-      value ?= rule.default
-      if value isnt null and value isnt undefined
+      value = @filterEach(rule, value)
+      if value isnt null
         _.set(dataFiltered, key, value)
   return dataFiltered
+
+
+
+exports.filterEach = (rule, value) ->
+  if (value is null) or (value is undefined)
+    value = rule.default ? null
+  return value
 
 
 

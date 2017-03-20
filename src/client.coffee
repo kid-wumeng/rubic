@@ -95,7 +95,7 @@ core.call = (ioName, data={}) ->
 
 core.onReadyStateChange = ->
   if @xhr.readyState is XMLHttpRequest.DONE
-    if @xhr.status is 200 or @xhr.status is 204
+    if @xhr.status < 300
       core.handleSuccess(@xhr, @resolve)
     else
       core.handleFailure(@xhr, @reject)
@@ -106,15 +106,16 @@ core.handleSuccess = (xhr, resolve) ->
   token = xhr.getResponseHeader('rubic-token')
   if token
     localStorage.setItem('rubic-token', token)
-  {$jsonDict, $dateDict} = JSON.parse(xhr.responseText)
   data = {}
-  for key of $jsonDict
-    value = $jsonDict[key]
-    core.set(data, key, value)
-  for key of $dateDict
-    value = $dateDict[key]
-    value = new Date(value)
-    core.set(data, key, value)
+  if xhr.status is 200
+    {$jsonDict, $dateDict} = JSON.parse(xhr.responseText)
+    for key of $jsonDict
+      value = $jsonDict[key]
+      core.set(data, key, value)
+    for key of $dateDict
+      value = $dateDict[key]
+      value = new Date(value)
+      core.set(data, key, value)
   resolve(data)
 
 
