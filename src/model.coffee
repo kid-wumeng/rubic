@@ -73,14 +73,16 @@ exports.createModel = (define) ->
   model = {}
   model.collection = define.collection
   model.schema = @createSchema(define)
-  model.findOne = (args...) => @findOne(model, args...)
-  model.find = (args...) => @find(model, args...)
-  model.count = (args...) => @count(model, args...)
-  model.create = (args...) => @create(model, args...)
-  model.update = (args...) => @update(model, args...)
-  model.remove = (args...) => @remove(model, args...)
-  model.restore = (args...) => @restore(model, args...)
-  model.delete = (args...) => @delete(model, args...)
+  model.findOne = (query, opt) => @findOne(model, query,  opt)
+  model.find = (query, opt) => @find(model, query, opt)
+  model.count = (query, opt) => @count(model, query, opt)
+  model.create = (data) => @create(model, data)
+  model.update = (query, modifier) => @update(model, query, modifier)
+  model.updateMany = (query, modifier) => @updateMany(model, query, modifier)
+  model.remove = (query) => @remove(model, query)
+  model.restore = (query) => @restore(model, query)
+  model.delete = (query) => @delete(model, query)
+  model.aggregate = (pipeline, opt) => @aggregate(model, pipeline, opt)
   return model
 
 
@@ -106,9 +108,6 @@ exports.getModelDict = ->
 exports.findOne = (model, query, opt) ->
   collection = model.collection
   schema = model.schema
-
-  if typeof(query) is 'number'
-    query = {id: query}
 
   query = @formatQuery(query)
   opt = @formatQueryOpt(model, opt)
@@ -177,14 +176,26 @@ exports.update = (model, query, modifier) ->
   collection = model.collection
   schema = model.schema
 
-  modifier = Schema.filter(schema, modifier)
+  query = @formatQuery(query)
+  modifier = @formatModifier(modifier)
+
+  opt = {returnOriginal: false}
+  result = await $db.collection(collection).findOneAndUpdate(query, modifier, opt)
+
+  # @TODO 支持model规则（主要是为了private属性的处理）
+  return result.value
+
+
+
+# @RETURN {Array[object]/null}
+exports.updateMany = (model, query, modifier) ->
+  collection = model.collection
+  schema = model.schema
 
   query = @formatQuery(query)
   modifier = @formatModifier(modifier)
-  opt = {returnOriginal: false}
-  result = await $db.collection(collection).findOneAndUpdate(query, modifier, opt)
-  # @TODO 支持model规则（主要是为了private属性的处理）
-  return result.value
+
+  await $db.collection(collection).updateMany(query, modifier)
 
 
 
@@ -213,8 +224,8 @@ exports.restore = (model, query) ->
     $unset: {removeDate: ''}
     $set: {restoreDate: new Date()}
   }
-  option = {returnOriginal: false}
-  result = await $db.collection(collection).findOneAndUpdate(query, modifier, option)
+  opt = {returnOriginal: false}
+  result = await $db.collection(collection).findOneAndUpdate(query, modifier, opt)
   # @TODO 支持model规则（主要是为了private属性的处理）
   return result.value
 
@@ -228,6 +239,12 @@ exports.delete = (model, query) ->
 
   await $db.collection(collection).deleteOne(query)
   return null
+
+
+
+exports.aggregate = (model, pipeline, opt) ->
+  collection = model.collection
+  return await $db.collection(collection).aggregate(pipeline, opt).toArray()
 
 
 
@@ -246,6 +263,8 @@ exports.createID = (collection) ->
 
 
 exports.formatQuery = (query={}) ->
+  if typeof(query) is 'number'
+    query = {id: query}
   query = Object.assign({}, query)
   query.removeDate = {$exists: false}
   return query
@@ -277,7 +296,11 @@ exports.formatModifier = (modifier={}) ->
     updateDate: new Date()
   }
   for key, value of modifier
-    if key[0] isnt '$'
+    if key[0] is '$'
+      if _.isPlainObject(value)
+        modifier[key] = value
+        delete modifier[key]['id']
+    else
       modifier.$set[key] = value
       delete modifier[key]
   # @TODO 在$inc等修改器中也限制对id的修改（是否报错？）
