@@ -1,6 +1,6 @@
 _ = require('lodash')
-fileType = require('file-type')
 helper = require('./helper')
+Rule = require('./Rule')
 
 
 
@@ -267,10 +267,10 @@ exports.check = (schema, data) ->
       items = @getItemsInArray(rule, data)
       for item in items
         {key, value} = item
-        @checkValue(rule, key, value)
+        await @checkValue(rule, key, value)
     else
       value = _.get(data, key)
-      @checkValue(rule, key, value)
+      await @checkValue(rule, key, value)
 
 
 
@@ -334,7 +334,7 @@ exports.checkValue = (rule, key, value) ->
     when Boolean then @checkBoolean(rule, key, value)
     when Number then @checkNumber(rule, key, value)
     when String then @checkString(rule, key, value)
-    when Buffer then @checkBuffer(rule, key, value)
+    when Buffer then await @checkFile(rule, key, value)
     when Date then @checkDate(rule, key, value)
   @checkCustom(rule, key, value)
 
@@ -394,18 +394,10 @@ exports.checkString = (rule, key, value) ->
 
 
 
-exports.checkBuffer = (rule, key, value) ->
-  if !(value instanceof Buffer)
-    throw "Data check error: '#{key}' should be a Buffer ( File in front-end )."
-  mime = fileType(value).mime
-  if rule.mime and !rule.mime.includes(mime)
-    throw "Data check error: mime of file '#{key}' should be in [#{rule.mime.join(', ')}]."
-  min = rule.min ? -Infinity
-  if value.length < min
-    throw "Data check error: size of file '#{key}' should be >= #{min/1024} kb."
-  max = rule.max ? Infinity
-  if value.length > max
-    throw "Data check error: size of file '#{key}' should be <= #{max/1024} kb."
+exports.checkFile = (rule, key, file) ->
+  Rule.fileType(rule, key, file)
+  Rule.fileMIME(rule, key, file)
+  await Rule.fileSize(rule, key, file)
 
 
 

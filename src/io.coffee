@@ -87,10 +87,10 @@ exports.wrap = (ioDefine) ->
   io = ioDefine.io
   if io.constructor.name is 'AsyncFunction'
     return (args...) ->
-      @body = await io.call(@, args...)
+      return await io.call(@, args...)
   else
     return (args...) ->
-      @body = io.call(@, args...)
+      return io.call(@, args...)
 
 
 
@@ -113,10 +113,10 @@ exports.call = (name, ctx) ->
   await schema.check(iSchema, data)
   # 举例：@call('findBook', ['john'])
   if Array.isArray(data)
-    await io(data...)
+    return await io(data...)
   # 举例：@call('findBook', {author: 'john'})
   else
-    await io(data)
+    return await io(data)
 
 
 

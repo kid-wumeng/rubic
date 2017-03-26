@@ -133,8 +133,11 @@ core.handleFailure = (xhr, reject) ->
 
 core.set = (data, key, value) ->
   names = key.split('.')
-  last = names.pop()
+  len = names.length
+  last = names[len-1]
   for name, i in names
+    if i is len-1
+      break
     if data[name] is undefined
       next = names[i+1]
       if /^\d+$/.test(next)

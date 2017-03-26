@@ -3,7 +3,6 @@ Koa = require('koa')
 cors = require('koa2-cors')
 asyncBusboy = require('async-busboy')
 jwt = require('jwt-simple')
-fs = require('fs-extra-promise')
 io = require('./io')
 
 
@@ -34,7 +33,7 @@ exports.callback = (ctx) =>
     ioName = ctx.get('rubic-io')
     await @joinData(ctx)
     @decodeToken(ctx)
-    await io.call(ioName, ctx)
+    ctx.body = await io.call(ioName, ctx)
     @encodeToken(ctx)
     @splitData(ctx)
   catch error
@@ -58,7 +57,7 @@ exports.joinData = (ctx) ->
   {fields, files} = await asyncBusboy(ctx.req)
   @joinJSONData(data, JSON.parse(fields.$jsonDict))
   @joinDateData(data, JSON.parse(fields.$dateDict))
-  await @joinFileData(data, files)
+  @joinFileData(data, files)
   ctx.data = data
 
 
@@ -77,9 +76,7 @@ exports.joinDateData = (data, dateDict) ->
 
 exports.joinFileData = (data, fileDict) ->
   for file in fileDict
-    buffer = await fs.readFileAsync(file.path)
-    buffer.$file = file
-    _.set(data, file.fieldname, buffer)
+    _.set(data, file.fieldname, file)
 
 
 

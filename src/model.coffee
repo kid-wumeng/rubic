@@ -37,8 +37,7 @@ exports.connect = (cfg) ->
 
 exports.ensureIDStore = (cfg) ->
   for name, {collection} of cfg.model
-    # @TODO table -> collection
-    idStore = await $db.collection('IDStore').findOne({table: collection})
+    idStore = await $db.collection('IDStore').findOne({collection})
     lastDoc = await $db.collection(collection).findOne({}, {
       sort: {id: -1}
       fields: {id: 1}
@@ -250,8 +249,7 @@ exports.aggregate = (model, pipeline, opt) ->
 
 exports.createID = (collection) ->
   result = await $db.collection('IDStore').findOneAndUpdate({
-    # @TODO table -> collection
-    table: collection
+    collection: collection
   },{
     $inc:{id: 1}
   },{
