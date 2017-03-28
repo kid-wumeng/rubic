@@ -10,25 +10,12 @@ module.exports = (schema, data, join) ->
 
     rule = _.get(schema, field)
 
-
     if _.isPlainObject(rule)
-      model = rule.join
-      model = @dict[model]
-      doc = _.get(data, field)
-      doc = await model.findOne(doc.id, opt)
-      _.set(data, field, doc)
+      await @findOneJoinOne(rule, data, field, opt)
 
     else if _.isArray(rule)
-      model = rule[0].join
-      model = @dict[model]
-      docs = _.get(data, field)
-      ids = docs.map (doc) -> doc.id
-      ids = _.uniq(ids)
-      docs = await model.find({
-        'id':
-          $in: ids
-      }, opt)
-      _.set(data, field, docs)
+      rule = rule[0]
+      await @findOneJoinArray(rule, data, field, opt)
 
     else
       throw "规则不存在"

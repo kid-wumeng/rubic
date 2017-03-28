@@ -9,13 +9,7 @@ exports.init = (cfg) ->
     Schema.init(cfg)
     await Model.init(cfg)
 
-    # res = await Model.dict['Collection'].find({id: 1}, {
-    #   join:
-    #     'user': 'email'
-    #     'fans': '-name'
-    # })
-
-    res = await Model.dict['User'].findOne({}, '-comment')
+    res = await Model.dict['Collection'].find({id: 1}, '-tags')
 
     console.log require('util').inspect(res, {depth: 10})
 

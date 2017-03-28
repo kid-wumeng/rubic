@@ -5,9 +5,9 @@ module.exports = (schema) ->
 
   cursor = []
 
-  forEach = (node) ->
+  forEach = (node) =>
 
-    if [Boolean, Number, String, Buffer, Date].includes(node.type)
+    if @isRuleNode(node)
       node.keyAbs = cursor.join('.')
       node.key = cursor[cursor.length-1]
       return

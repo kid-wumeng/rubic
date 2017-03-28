@@ -3,9 +3,9 @@ _ = require('lodash')
 
 module.exports = (schema, callback) ->
 
-  forEach = (node) ->
+  forEach = (node) =>
 
-    if [Boolean, Number, String, Buffer, Date].includes(node.type)
+    if @isRuleNode(node)
       callback(node)
       return
 

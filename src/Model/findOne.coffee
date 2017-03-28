@@ -19,10 +19,3 @@ module.exports = ( model, query, opt ) ->
 
 
   return data
-
-  # if data
-  #   data = Schema.filter(schema, data)
-  #   if opt.join
-  #     await @findOneJoin({model, data, opt})
-
-  # return data

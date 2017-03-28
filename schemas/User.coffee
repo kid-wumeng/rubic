@@ -13,3 +13,9 @@ module.exports =
       type: Number
       min: 0
       default: 0
+
+  'fans': [{
+    join: 'User'
+    'id':
+      $ref: 'User.id'
+  }]

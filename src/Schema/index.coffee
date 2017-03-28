@@ -12,3 +12,4 @@ module.exports =
 
   # private-methods
   defaultProps: require('./defaultProps')
+  isRuleNode: require('./isRuleNode')
