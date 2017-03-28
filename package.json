@@ -2,7 +2,8 @@
   "name": "Mars",
   "version": "0.1.0",
   "scripts": {
-    "build-client": "coffee --output lib --compile src/client.coffee"
+    "test": "./node_modules/mocha/bin/mocha -u tdd --compilers coffee:coffeescript/register --recursive --harmony",
+    "build-client": "coffee --output lib --compile src2/client.coffee"
   },
   "dependencies": {
     "async-busboy": "^0.3.4",
@@ -22,5 +23,9 @@
     "object-end-keys": "^3.0.0",
     "redis": "^2.7.1",
     "require-dir": "^0.3.1"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "mocha": "^3.2.0"
   }
 }

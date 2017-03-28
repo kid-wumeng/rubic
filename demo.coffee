@@ -1,14 +1,14 @@
-Core = require('./src/Core')
+rubic = require('./src')
 
 
-
-# Core.init({
-#   dir:
-#     io: "#{__dirname}/demo/io"
-#     schema: "#{__dirname}/demo/schemas"
-#   tokenSecret: 'kid'
-#   token:
-#     user: 60
-#   database:
-#     name: 'test'
-# })
+rubic.init({
+  dir:
+    io: "#{__dirname}/io"
+    schema: "#{__dirname}/schemas"
+  tokenSecret: 'i am coding'
+  token:
+    user: 60
+    admin: 10
+  database:
+    name: 'orz-world'
+})
