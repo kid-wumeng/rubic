@@ -1,4 +1,4 @@
-module.exports = (model, opt) ->
+module.exports = (opt) ->
 
   { page=1, size=0 } = opt
 

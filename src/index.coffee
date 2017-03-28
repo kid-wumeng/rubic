@@ -9,7 +9,15 @@ exports.init = (cfg) ->
     Schema.init(cfg)
     await Model.init(cfg)
 
-    console.log Model.dict['User'].findOne({}, {fields: '-createDate -updateDate -removeDate -restoreDate'})
+    # res = await Model.dict['Collection'].find({id: 1}, {
+    #   join:
+    #     'user': 'email'
+    #     'fans': '-name'
+    # })
+
+    res = await Model.dict['User'].findOne({}, '-comment')
+
+    console.log require('util').inspect(res, {depth: 10})
 
     console.log 'rubic start, good luck everybody ~'.green
 

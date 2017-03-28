@@ -9,10 +9,12 @@ module.exports =
 
   # private-methods
   connect: require('./connect')
-  defaultProps: require('./defaultProps')
   ensureIDStore: require('./ensureIDStore')
   ensureIndex: require('./ensureIndex')
+  find: require('./find')
+  findJoin: require('./findJoin')
   findOne: require('./findOne')
+  findOneJoin: require('./findOneJoin')
   formatQuery: require('./formatQuery')
   formatQueryOpt: require('./formatQueryOpt')
   formatQueryOptFields: require('./formatQueryOptFields')

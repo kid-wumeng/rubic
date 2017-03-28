@@ -2,7 +2,7 @@ _ = require('lodash')
 Schema = require('../Schema')
 
 
-module.exports = (model, opt) ->
+module.exports = (opt, model) ->
 
   fields = opt.fields ? {}
 
@@ -30,12 +30,16 @@ module.exports = (model, opt) ->
 
 
   mode = 'none'
+
   for name, mode of fields
     if mode is 1
       mode = 'pick'
     else
       mode = 'omit'
     break
+
+  if mode is 'pick'
+    fields['id'] = 1
 
   if mode is 'none' or mode is 'omit'
 

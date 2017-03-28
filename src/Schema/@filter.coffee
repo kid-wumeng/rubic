@@ -25,11 +25,15 @@ module.exports = (node, data) ->
       childNode = childNode[0]
 
       childDataArray = _.get(data, key)
-      childDataArray ?= []
 
-      childDataArray = childDataArray.map (childData) =>
-        return @filter(childNode, childData)
+      if childDataArray
 
-      _.set(dataFiltered, key, childDataArray)
+        childDataArray = childDataArray.map (childData) =>
+          return @filter(childNode, childData)
 
-  return dataFiltered
+        _.set(dataFiltered, key, childDataArray)
+
+  if _.isEmpty(dataFiltered)
+    return undefined
+  else
+    return dataFiltered
