@@ -1,11 +1,11 @@
 _ = require('lodash')
 
 
-module.exports = (schema, dict) ->
+module.exports = (schema) ->
 
-  execute = (node) ->
+  execute = (node) =>
     if node.$ref
-      refa = _.get(dict, node.$ref)
+      refa = _.get(@dict, node.$ref)
       if !refa
         throw "$ref '#{node.$ref}' not found"
       node = _.defaultsDeep(node, refa)
@@ -17,7 +17,7 @@ module.exports = (schema, dict) ->
 
       return execute(node)
 
-    node = _.mapValues node, (value, key) ->
+    node = _.mapValues node, (value, key) =>
 
       if _.isPlainObject(value)
         obj = value

@@ -72,7 +72,7 @@ exports.createModel = (define) ->
   model = {}
   model.collection = define.collection
   model.schema = @createSchema(define)
-  model.findOne = (query, opt) => @findOne(model, query,  opt)
+  model.findOne = (query, opt) => @findOne(model, query, opt)
   model.find = (query, opt) => @find(model, query, opt)
   model.count = (query, opt) => @count(model, query, opt)
   model.create = (data) => @create(model, data)

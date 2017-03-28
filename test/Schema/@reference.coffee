@@ -1,4 +1,4 @@
-reference = require('../../src/Schema/reference')
+reference = require('../../src/Schema/@reference')
 
 
 suite 'Schema.reference', ->

@@ -1,7 +1,3 @@
-traverseDir = require('./traverseDir')
-
-
-
 ###
 
   假设有2个文件：
@@ -22,7 +18,7 @@ module.exports = (dirPath) ->
 
   reg = new RegExp("^#{dirPath}/")
 
-  traverseDir dirPath, (file) ->
+  @traverseDir dirPath, (file) ->
 
     absolutePath = "#{file.dir}/#{file.name}"
     relativePath = absolutePath.replace(reg, '')

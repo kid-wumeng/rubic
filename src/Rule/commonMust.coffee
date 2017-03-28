@@ -1,7 +1,7 @@
 _ = require('lodash')
 
 
-module.exports = (rule, value)
+module.exports = (rule, value) ->
 
   if rule.must
     if _.isNil(value)

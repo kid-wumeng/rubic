@@ -3,8 +3,9 @@ rubic = require('./src')
 
 rubic.init({
   dir:
-    io: "#{__dirname}/io"
     schema: "#{__dirname}/schemas"
+    model: "#{__dirname}/models"
+    io: "#{__dirname}/io"
   tokenSecret: 'i am coding'
   token:
     user: 60

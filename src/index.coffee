@@ -1,19 +1,23 @@
 require('colors')
 Schema = require('./Schema')
-
-
-schemaDict = null
+Model = require('./Model')
 
 
 exports.init = (cfg) ->
   try
 
-    {schemaDict} = Schema.init(cfg)
+    Schema.init(cfg)
+    await Model.init(cfg)
+
+    console.log Model.dict['User'].findOne({}, {fields: '-createDate -updateDate -removeDate -restoreDate'})
 
     console.log 'rubic start, good luck everybody ~'.green
 
   catch error
-    @handleError(error)
+    if typeof(error) is 'string'
+      console.log error.red
+    else
+      console.log error
 
 
 
