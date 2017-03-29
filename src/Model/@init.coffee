@@ -2,7 +2,7 @@ Helper = require('../Helper')
 Schema = require('../Schema')
 
 
-module.exports = (cfg, schemaDict) ->
+module.exports = (cfg) ->
 
   await @connect(cfg)
 
