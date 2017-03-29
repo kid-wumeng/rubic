@@ -1,23 +1,28 @@
-module.exports = (dict) ->
+module.exports = (defineDict) ->
 
 
-  dictFormatted = {}
+  dict = {}
 
 
-  for name, io of dict
-
-    @formatSchemaIn(io)
-    io = @wrap(io)
+  for name, define of defineDict
 
 
     if @isPublic(name)
       name = @formatName(name)
-      io.isPublic = true
+      define.isPublic = true
     else
-      io.isPublic = false
+      define.isPublic = false
 
 
-    dictFormatted[name] = io
+    define.name = name
+    @formatSchemaIn(define)
 
 
-  return dictFormatted
+    io = @wrap(define)
+    io.define = define
+
+
+    dict[name] = io
+
+
+  return dict

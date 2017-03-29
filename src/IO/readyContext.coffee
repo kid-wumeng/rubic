@@ -4,6 +4,8 @@ Model = require('../Model')
 
 module.exports = (ctx) ->
 
+  ctx.rubicIOCallChain = []
+
   ctx.io = {}
 
   for name, io of @dict
@@ -11,3 +13,5 @@ module.exports = (ctx) ->
     _.set(ctx.io, name, io)
 
   ctx.model = Model.dict
+
+  ctx.signToken = @signToken.bind(ctx, @tokenDict)

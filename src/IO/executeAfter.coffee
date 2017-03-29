@@ -1,6 +1,6 @@
-module.exports = (io, oData) ->
+module.exports = (ctx, oData, define) ->
 
-  {oSchema} = io
+  {oSchema} = define
 
   if oSchema
     return oData

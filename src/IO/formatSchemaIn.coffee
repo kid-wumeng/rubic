@@ -1,9 +1,9 @@
 _ = require('lodash')
 
 
-module.exports = (io) ->
+module.exports = (define) ->
 
-  { iSchema } = io
+  { iSchema } = define
 
   if _.isPlainObject(iSchema)
     iSchemaArray = [iSchema]
@@ -14,4 +14,4 @@ module.exports = (io) ->
   else
     throw "iSchema should be an object or array."
 
-  io.iSchemaArray = iSchemaArray.map(@formatSchema)
+  define.iSchemaArray = iSchemaArray.map(@formatSchema)

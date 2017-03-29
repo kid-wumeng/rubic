@@ -4,6 +4,7 @@ Schema = require('../Schema')
 
 module.exports = (cfg) ->
 
-  dict = Helper.requireDir(cfg.dir.io)
+  defineDict = Helper.requireDir(cfg.dir.io)
+  @dict = @formatDict(defineDict)
 
-  @dict = @formatDict(dict)
+  @tokenDict = cfg.token

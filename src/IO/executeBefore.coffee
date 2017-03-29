@@ -1,11 +1,23 @@
 _ = require('lodash')
 Schema = require('../Schema')
+checkToken = require('./checkToken')
 
 
-module.exports = (io, iDataArray) ->
+module.exports = (ctx, iDataArray, define) ->
 
-  { iSchemaArray } = io
 
+  { name, iSchemaArray } = define
+
+
+  # io调用链压入io名
+  ctx.rubicIOCallChain.push(define.name)
+
+
+  # 令牌校验
+  checkToken(ctx, define)
+
+
+  # 数据校验
   iDataArrayFiltered = []
 
   for schema, i in iSchemaArray
@@ -14,5 +26,6 @@ module.exports = (io, iDataArray) ->
       check: true
     })
     iDataArrayFiltered.push(data)
+
 
   return iDataArrayFiltered

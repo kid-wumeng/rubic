@@ -5,9 +5,9 @@ module.exports = (name, ctx) ->
   if !io
     throw "io <#{name}> is not found"
 
-  if !io.isPublic
+  if !io.define.isPublic
     throw "io <#{name}> is not public"
 
   @readyContext(ctx)
 
-  return await io.call(ctx, ctx.iDataArray...)
+  ctx.oData = await io.call(ctx, ctx.iDataArray...)

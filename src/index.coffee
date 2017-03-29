@@ -13,7 +13,10 @@ exports.init = (cfg) ->
 
     ctx =
       iDataArray: [4, 6]
-    console.log await IO.callByRequest('shop.findUser', ctx)
+      iToken:
+        $type: 'user'
+        $expires: Date.now() + 10000000
+    await IO.callByRequest('shop.findUser', ctx)
 
 
     console.log 'rubic start, good luck everybody ~'.green
