@@ -4,4 +4,4 @@ _ = require('lodash')
 module.exports = (value) ->
 
   if !_.isString(value)
-    throw new Error()
+    throw "value should be a string."

@@ -8,7 +8,8 @@ module.exports = ( model, query, opt ) ->
   query = @formatQuery(query)
   opt = @formatQueryOpt(opt, model)
 
-  data = await @db.collection(collection)
+  data = await @db
+    .collection(collection)
     .findOne(query, opt)
 
   if data
@@ -16,6 +17,5 @@ module.exports = ( model, query, opt ) ->
 
   if opt.join
     await @findOneJoin(schema, data, opt.join)
-
 
   return data

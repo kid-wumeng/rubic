@@ -5,5 +5,3 @@ module.exports = (schema) ->
   schema.updateDate  = { type: Date }
   schema.removeDate  = { type: Date }
   schema.restoreDate = { type: Date }
-
-  return schema

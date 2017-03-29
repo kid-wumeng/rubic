@@ -44,6 +44,7 @@ module.exports = (opt, model) ->
   if mode is 'none' or mode is 'omit'
 
     {schema} = model
+
     Schema.forRule schema, (rule) ->
 
       if rule.private

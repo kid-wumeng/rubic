@@ -12,6 +12,7 @@ module.exports = (cfg, schemaDict) ->
     model.schema ?= {}
     model.schema = Schema.reference(model.schema)
     Schema.computeKey(model.schema)
+    Schema.formatRule(model.schema)
     await @ensureIDStore(model)
     await @ensureIndex(model)
     @wrap(model)

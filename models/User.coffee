@@ -14,6 +14,7 @@ module.exports =
       max: 100
       format: 'email'
       private: true
+      must: true
 
     'comment': {
       'replies': [{

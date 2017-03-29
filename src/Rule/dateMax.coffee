@@ -1,5 +1,7 @@
 module.exports = (rule, value) ->
 
-  if rule.max
-    if value.getTime() > rule.max.getTime()
-      throw new Error()
+  {max} = rule
+
+  if max
+    if value.getTime() > max.getTime()
+      throw "value should be <= #{max}, current #{value}."

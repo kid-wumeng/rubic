@@ -5,11 +5,12 @@ module.exports =
 
   # public-methods
   filter: require('./@filter')
+  formatRule: require('./@formatRule')
   forRule: require('./@forRule')
   init: require('./@init')
   computeKey: require('./@computeKey')
   reference: require('./@reference')
 
   # private-methods
-  defaultProps: require('./defaultProps')
+  addDefaultField: require('./addDefaultField')
   isRuleNode: require('./isRuleNode')

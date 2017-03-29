@@ -7,4 +7,4 @@ module.exports = (rule, value)->
 
     when 'email'
       if !isEmailAddress(value)
-        throw new Error()
+        throw "value should be a email-address."

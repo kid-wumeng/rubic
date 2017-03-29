@@ -4,4 +4,4 @@ _ = require('lodash')
 module.exports = (value) ->
 
   if !_.isDate(value)
-    throw new Error()
+    throw "value should be a Date."

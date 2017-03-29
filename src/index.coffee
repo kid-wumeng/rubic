@@ -9,9 +9,8 @@ exports.init = (cfg) ->
     Schema.init(cfg)
     await Model.init(cfg)
 
-    res = await Model.dict['Collection'].find({id: 1}, '-tags')
-
-    console.log require('util').inspect(res, {depth: 10})
+    res = await Model.dict['User'].find()
+    console.log res
 
     console.log 'rubic start, good luck everybody ~'.green
 

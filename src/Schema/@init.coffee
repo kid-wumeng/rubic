@@ -6,7 +6,7 @@ module.exports = (cfg) ->
   @dict = Helper.requireDir(cfg.dir.schema)
 
   for name, schema of @dict
-    @dict[name] = @defaultProps(schema)
+    @addDefaultField(schema)
 
   for name, schema of @dict
     @dict[name] = @reference(schema, @dict)

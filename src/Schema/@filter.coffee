@@ -2,14 +2,22 @@ _ = require('lodash')
 Rule = require('../Rule')
 
 
-module.exports = (node, data) ->
+module.exports = (node, data, opt) ->
 
+  opt ?= {}
 
   # 过滤值（值的校验是可选的）
   if @isRuleNode(node)
     rule = node
     value = data
-    return Rule.parseValue(rule, value)
+
+    value = Rule.parseValue(rule, value)
+
+    if opt.check
+      Rule.checkValue(rule, value)
+
+    return value
+
 
 
   dataFiltered = {}
@@ -22,9 +30,9 @@ module.exports = (node, data) ->
     if _.isPlainObject(childNode)
 
       childData = _.get(data, key)
-      childData = @filter(childNode, childData)
+      childData = @filter(childNode, childData, opt)
 
-      if childData
+      if childData isnt undefined
         _.set(dataFiltered, key, childData)
 
 
@@ -35,7 +43,8 @@ module.exports = (node, data) ->
       childDataArray = _.get(data, key)
 
       if childDataArray
-        childDataArray = childDataArray.map (childData) => @filter(childNode, childData)
+        childDataArray = childDataArray.map (childData) =>
+          return @filter(childNode, childData, opt)
 
         _.set(dataFiltered, key, childDataArray)
 

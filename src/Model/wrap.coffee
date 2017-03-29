@@ -1,7 +1,9 @@
 module.exports = ( model ) ->
 
-  model.findOne = (query, opt) =>
-    @findOne(model, query, opt)
-
-  model.find = (query, opt) =>
-    @find(model, query, opt)
+  model.findOne = @findOne.bind(@, model)
+  model.find = @find.bind(@, model)
+  model.count = @count.bind(@, model)
+  model.createOne = @createOne.bind(@, model)
+  model.updateOne = @updateOne.bind(@, model)
+  model.updateMany = @updateMany.bind(@, model)
+  model.removeOne = @removeOne.bind(@, model)

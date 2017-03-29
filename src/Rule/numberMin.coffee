@@ -6,4 +6,4 @@ module.exports = (rule, value) ->
   min = rule.min ? -Infinity
 
   if value < min
-    throw new Error()
+    throw "value should be >= #{min}, current #{value}."

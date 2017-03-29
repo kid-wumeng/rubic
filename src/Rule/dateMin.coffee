@@ -1,5 +1,7 @@
 module.exports = (rule, value) ->
 
-  if rule.min
-    if value.getTime() < rule.min.getTime()
-      throw new Error()
+  {min} = rule
+
+  if min
+    if value.getTime() < min.getTime()
+      throw "value should be >= #{min}, current #{value}."

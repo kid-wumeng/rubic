@@ -5,4 +5,4 @@ module.exports = (rule, value) ->
 
   if rule.must
     if _.isNil(value)
-      throw new Error()
+      throw "this is a must field."

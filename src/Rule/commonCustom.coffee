@@ -10,4 +10,4 @@ module.exports = (rule, value) ->
       result = check(value)
 
     if result isnt true
-      throw new Error()
+      throw "value is invalid in custom-check."
