@@ -2,6 +2,7 @@ require('colors')
 Schema = require('./Schema')
 Model = require('./Model')
 IO = require('./IO')
+Redis = require('./Redis')
 
 
 exports.init = (cfg) ->
@@ -10,6 +11,7 @@ exports.init = (cfg) ->
     Schema.init(cfg)
     await Model.init(cfg)
     IO.init(cfg)
+    Redis.init(cfg)
 
     ctx =
       iDataArray: [4, 6]

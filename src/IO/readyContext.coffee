@@ -1,10 +1,13 @@
 _ = require('lodash')
 Model = require('../Model')
+Redis = require('../Redis')
 
 
 module.exports = (ctx) ->
 
+
   ctx.rubicIOCallChain = []
+
 
   ctx.io = {}
 
@@ -12,6 +15,11 @@ module.exports = (ctx) ->
     io = io.bind(ctx)
     _.set(ctx.io, name, io)
 
+
   ctx.model = Model.dict
+
+
+  ctx.redis = Redis.client
+
 
   ctx.signToken = @signToken.bind(ctx, @tokenDict)
