@@ -6,6 +6,7 @@ module.exports =
   countStringByWidth: require('./@countStringByWidth')
   isEmailAddress: require('./@isEmailAddress')
   requireDir: require('./@requireDir')
+  traverseLeaf: require('./@traverseLeaf')
 
   # private-methods
   traverseDir: require('./traverseDir')

@@ -31,3 +31,6 @@ module.exports =
   'publishDate':
     desc: '发行日期'
     type: Date
+
+  'intro':
+    type: String

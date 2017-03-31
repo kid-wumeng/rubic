@@ -1,8 +1,5 @@
 module.exports =
 
-  token:
-    user: true
-
   iSchema: [{
     $ref: 'User.id'
     must: true

@@ -3,6 +3,7 @@ Schema = require('./Schema')
 Model = require('./Model')
 IO = require('./IO')
 Redis = require('./Redis')
+Network = require('./Network')
 
 
 exports.init = (cfg) ->
@@ -12,14 +13,7 @@ exports.init = (cfg) ->
     await Model.init(cfg)
     IO.init(cfg)
     Redis.init(cfg)
-
-    ctx =
-      iDataArray: [4, 6]
-      iToken:
-        $type: 'user'
-        $expires: Date.now() + 10000000
-    await IO.callByRequest('shop.findUser', ctx)
-
+    Network.init(cfg)
 
     console.log 'rubic start, good luck everybody ~'.green
 

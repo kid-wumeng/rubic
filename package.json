@@ -1,5 +1,5 @@
 {
-  "name": "Mars",
+  "name": "Rubic",
   "version": "0.1.0",
   "scripts": {
     "test": "./node_modules/mocha/bin/mocha -u tdd --compilers coffee:coffeescript/register --recursive --harmony",
@@ -7,6 +7,7 @@
   },
   "dependencies": {
     "async-busboy": "^0.3.4",
+    "axios": "^0.15.3",
     "bluebird": "^3.5.0",
     "co": "^4.6.0",
     "coffeescript": "^2.0.0-alpha1",
@@ -14,9 +15,11 @@
     "deep-assign": "^2.0.0",
     "deep-keys": "^0.4.0",
     "file-type": "^4.1.0",
+    "form-data": "^2.1.2",
     "fs-extra-promise": "^0.4.1",
     "jwt-simple": "^0.5.1",
     "koa": "^2.0.1",
+    "koa-compress": "^2.0.0",
     "koa2-cors": "^2.0.3",
     "lodash": "^4.17.4",
     "mongodb": "^2.2.24",
