@@ -1,8 +1,3 @@
-module.exports = (ctx, oData, define) ->
-
-  {oSchema} = define
-
-  if oSchema
-    return oData
-  else
-    return undefined
+module.exports = (ctx, data, define) ->
+  
+  return if define.oSchema then data else undefined

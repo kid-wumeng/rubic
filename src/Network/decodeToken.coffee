@@ -2,7 +2,8 @@ jwt = require('jwt-simple')
 
 
 module.exports = (ctx) ->
+  
+  tokenString = ctx.get('Rubic-Token')
 
-  token = ctx.get('Rubic-I-Token')
-  if token
-    ctx.iToken = jwt.decode(token, @tokenSecret)
+  if tokenString
+    ctx.request.token = jwt.decode(tokenString, @tokenSecret)

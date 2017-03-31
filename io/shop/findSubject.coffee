@@ -10,4 +10,4 @@ module.exports =
       $ref: 'Subject'
 
   io: ({id}) ->
-    return await @model.Subject.findOne({}, {fields: 'id type name', size: 1})
+    return await @model.Subject.findOne(id)

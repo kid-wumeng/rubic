@@ -3,6 +3,8 @@ jwt = require('jwt-simple')
 
 module.exports = (ctx) ->
 
-  if ctx.oToken
-    token = jwt.encode(ctx.oToken, @tokenSecret)
-    ctx.set('Rubic-O-Token', token)
+  token = ctx.response.token
+
+  if token
+    tokenString = jwt.encode(token, @tokenSecret)
+    ctx.set('Rubic-Token', tokenString)

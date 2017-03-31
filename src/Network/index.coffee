@@ -8,7 +8,7 @@ module.exports =
 
   # private-methods
   callback: require('./callback')
-  decodeDataArray: require('./decodeDataArray')
+  decodeData: require('./decodeData')
   decodeToken: require('./decodeToken')
   encodeData: require('./encodeData')
   encodeToken: require('./encodeToken')

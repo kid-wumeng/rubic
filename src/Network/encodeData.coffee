@@ -4,50 +4,19 @@ Helper = require('../Helper')
 
 module.exports = (ctx) ->
 
+  {data} = ctx.response
 
-  {oData} = ctx
-
-
-  if oData is undefined
+  if data
+    if !_.isPlainObject(data)
+      throw "response-data should be a plain-object."
+  else
     return
 
+  Helper.traverseLeaf data, (value, key, parent) ->
 
-  else if _.isBoolean(oData)
-    ctx.set('Rubic-O-Data-Type', 'boolean')
-    ctx.body = oData
+    if _.isDate(value)
+      date = value
+      timeStamp = date.getTime()
+      parent[key] = "\/Date\(#{timeStamp}\)\/"
 
-
-  else if _.isFinite(oData)
-    ctx.set('Rubic-O-Data-Type', 'number')
-    ctx.body = oData
-
-
-  else if _.isString(oData)
-    ctx.set('Rubic-O-Data-Type', 'string')
-    ctx.body = oData
-
-
-  else if _.isDate(oData)
-    ctx.set('Rubic-O-Data-Type', 'date')
-    ctx.body = oData.getTime()
-
-
-  else
-
-    if _.isPlainObject(oData)
-      ctx.set('Rubic-O-Data-Type', 'plain-object')
-
-    else if _.isArray(oData)
-      ctx.set('Rubic-O-Data-Type', 'array')
-
-    $json = {}
-    $date = {}
-
-    Helper.traverseLeaf oData, (key, value) ->
-      switch
-        when _.isBoolean(value), _.isFinite(value), _.isString(value)
-          _.set($json, key, value)
-        when value instanceof Date
-          _.set($date, key, value.getTime())
-
-    ctx.body = {$json, $date}
+  ctx.response.body = ctx.response.data

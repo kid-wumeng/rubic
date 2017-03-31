@@ -15,7 +15,9 @@ module.exports = (defineDict) ->
 
 
     define.name = name
-    @formatSchemaIn(define)
+
+
+    define.iSchema = @formatSchema(define.iSchema)
 
 
     io = @wrap(define)

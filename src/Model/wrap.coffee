@@ -7,3 +7,4 @@ module.exports = ( model ) ->
   model.updateOne = @updateOne.bind(@, model)
   model.updateMany = @updateMany.bind(@, model)
   model.removeOne = @removeOne.bind(@, model)
+  model.aggregate = @aggregate.bind(@, model)

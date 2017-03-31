@@ -7,13 +7,13 @@ module.exports = (ctx) ->
     # '/shop.findBook' -> 'shop.findBook'
     name = ctx.path.slice(1)
 
-    await @decodeDataArray(ctx)
-    await @decodeToken(ctx)
+    @decodeData(ctx)
+    @decodeToken(ctx)
 
     await IO.callByRequest(name, ctx)
 
-    await @encodeData(ctx)
-    await @encodeToken(ctx)
+    @encodeData(ctx)
+    @encodeToken(ctx)
 
   catch error
     @handleError(ctx, error)

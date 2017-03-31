@@ -16,7 +16,6 @@ module.exports =
   formatDict: require('./formatDict')
   formatName: require('./formatName')
   formatSchema: require('./formatSchema')
-  formatSchemaIn: require('./formatSchemaIn')
   isPublic: require('./isPublic')
   readyContext: require('./readyContext')
   wrap: require('./wrap')

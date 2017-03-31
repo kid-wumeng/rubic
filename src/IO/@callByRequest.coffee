@@ -10,4 +10,4 @@ module.exports = (name, ctx) ->
 
   @readyContext(ctx)
 
-  ctx.oData = await io.call(ctx, ctx.iDataArray...)
+  ctx.response.data = await io.call(ctx, ctx.request.data)

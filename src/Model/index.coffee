@@ -5,6 +5,7 @@ module.exports =
   db: null
 
   # public-methods
+  aggregate: require('./@aggregate')
   count: require('./@count')
   createOne: require('./@createOne')
   find: require('./@find')

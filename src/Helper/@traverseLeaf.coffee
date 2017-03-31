@@ -3,28 +3,18 @@ _ = require('lodash')
 
 module.exports = (tree, callback) ->
 
-
-  cursor = []
-
-
-  forEach = (node) =>
+  forEach = (node, key, parent) =>
 
     if _.isPlainObject(node)
-      for name, child of node
-        cursor.push(name)
-        forEach(child)
-        cursor.pop()
+      for childKey, child of node
+        forEach(child, childKey, node)
 
     else if _.isArray(node)
       for child, i in node
-        cursor.push(i)
-        forEach(child)
-        cursor.pop()
+        forEach(child, i, node)
 
     else
-      key = cursor.join('.')
-      value = node
-      callback(key, value)
+      callback(node, key, parent)
 
 
-  forEach(tree)
+  forEach(tree, null, null)

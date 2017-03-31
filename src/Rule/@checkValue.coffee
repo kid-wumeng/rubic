@@ -26,6 +26,11 @@ module.exports = (rule, value) ->
         @dateType(value)
         @dateMin(rule, value)
         @dateMax(rule, value)
+      when Buffer
+        @bufferType(value)
+        @bufferMin(rule, value)
+        @bufferMax(rule, value)
+        @bufferMime(rule, value)
 
     @commonCustom(rule, value)
 

@@ -1,6 +1,7 @@
 Koa = require('koa')
 cors = require('koa2-cors')
 compress = require('koa-compress')
+bodyParser = require('koa-bodyparser')
 
 
 module.exports = (cfg) ->
@@ -10,7 +11,12 @@ module.exports = (cfg) ->
   app.use(cors({
     origin: '*'
     allowMethods: ['POST']
-    exposeHeaders: ['Rubic-O-Data-Type', 'Rubic-O-Token']
+    exposeHeaders: ['Rubic-Token']
+  }))
+
+  app.use(bodyParser({
+    enableTypes: ['json']
+    jsonLimit: '2mb'
   }))
 
   app.use(compress())

@@ -7,6 +7,10 @@ module.exports =
 
   # private-methods
   booleanType: require('./booleanType')
+  bufferMax: require('./bufferMax')
+  bufferMime: require('./bufferMime')
+  bufferMin: require('./bufferMin')
+  bufferType: require('./bufferType')
   commonCustom: require('./commonCustom')
   commonEnum: require('./commonEnum')
   commonMust: require('./commonMust')

@@ -2,8 +2,11 @@
   "name": "Rubic",
   "version": "0.1.0",
   "scripts": {
-    "test": "./node_modules/mocha/bin/mocha -u tdd --compilers coffee:coffeescript/register --recursive --harmony",
-    "build-client": "coffee --output lib --compile src2/client.coffee"
+    "test": "mocha -u tdd --compilers coffee:coffeescript/register --recursive --harmony",
+    "coffee": "./node_modules/coffee-script/bin/coffee -o lib -c src/Client/*.coffee",
+    "uglify-web": "uglifyjs -c -m -o lib/web.min.js -- lib/web.js",
+    "uglify-ns": "uglifyjs -c -m -o lib/native-script.min.js -- lib/native-script.js",
+    "build": "npm run coffee && npm run uglify-web && npm run uglify-ns"
   },
   "dependencies": {
     "async-busboy": "^0.3.4",
@@ -19,6 +22,7 @@
     "fs-extra-promise": "^0.4.1",
     "jwt-simple": "^0.5.1",
     "koa": "^2.0.1",
+    "koa-bodyparser": "^4.2.0",
     "koa-compress": "^2.0.0",
     "koa2-cors": "^2.0.3",
     "lodash": "^4.17.4",
@@ -29,6 +33,8 @@
   },
   "devDependencies": {
     "chai": "^3.5.0",
-    "mocha": "^3.2.0"
+    "coffee-script": "^1.12.4",
+    "mocha": "^3.2.0",
+    "uglify-js": "^2.8.20"
   }
 }

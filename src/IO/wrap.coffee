@@ -14,16 +14,16 @@ module.exports = (define) ->
 
 
   if fn.constructor.name is 'AsyncFunction'
-    return (iDataArray...) ->
-      iDataArray = executeBefore(@, iDataArray, define)
-      oData = await fn.call(@, iDataArray...)
-      oData = executeAfter(@, oData, define)
-      return oData
+    return (data) ->
+      data = executeBefore(@, data, define)
+      data = await fn.call(@, data)
+      data = executeAfter(@, data, define)
+      return data
 
 
   else
-    return (iDataArray...) ->
-      iDataArray = executeBefore(@, iDataArray, define)
-      oData = fn.call(@, iDataArray...)
-      oData = executeAfter(@, oData, define)
-      return oData
+    return (data) ->
+      data = executeBefore(@, data, define)
+      data = fn.call(@, data)
+      data = executeAfter(@, data, define)
+      return data
