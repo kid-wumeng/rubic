@@ -21,4 +21,6 @@ module.exports = (model, data) ->
     .collection(collection)
     .insertOne(data)
 
-  return result.ops[0].id
+  # @TODO 安全检查
+  doc = result.ops[0]
+  return doc

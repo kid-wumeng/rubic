@@ -1,2 +1,10 @@
+_ = require('lodash')
+
+
 module.exports = (node) ->
-  return [Boolean, Number, String, Buffer, Date].includes(node.type)
+
+  if _.isPlainObject(node)
+    if [Boolean, Number, String, Buffer, Date, Object].includes(node.type)
+      return true
+
+  return false

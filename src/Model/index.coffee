@@ -7,13 +7,13 @@ module.exports =
   # public-methods
   aggregate: require('./@aggregate')
   count: require('./@count')
-  createOne: require('./@createOne')
+  create: require('./@create')
   find: require('./@find')
   findOne: require('./@findOne')
   init: require('./@init')
-  removeOne: require('./@removeOne')
+  remove: require('./@remove')
+  update: require('./@update')
   updateMany: require('./@updateMany')
-  updateOne: require('./@updateOne')
 
   # private-methods
   connect: require('./connect')

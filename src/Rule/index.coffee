@@ -20,6 +20,7 @@ module.exports =
   numberMax: require('./numberMax')
   numberMin: require('./numberMin')
   numberType: require('./numberType')
+  objectType: require('./objectType')
   stringFormat: require('./stringFormat')
   stringMax: require('./stringMax')
   stringMin: require('./stringMin')

@@ -31,6 +31,8 @@ module.exports = (rule, value) ->
         @bufferMin(rule, value)
         @bufferMax(rule, value)
         @bufferMime(rule, value)
+      when Buffer
+        @objectType(value)
 
     @commonCustom(rule, value)
 

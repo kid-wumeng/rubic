@@ -7,6 +7,7 @@ Network = require('./Network')
 
 
 exports.init = (cfg) ->
+
   try
 
     Schema.init(cfg)
