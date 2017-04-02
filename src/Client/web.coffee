@@ -1,7 +1,8 @@
 $host = null
+$onError = null
 
 
-window.Rubic = {
+Rubic = {
 
   host: (host) ->
     len = host.length
@@ -9,6 +10,10 @@ window.Rubic = {
     if last isnt '/'
       host += '/'
     $host = host
+
+
+  onError: (onError) ->
+    $onError = onError
 
 
   fromDataURL: (dataUrl) ->
@@ -65,9 +70,17 @@ window.Rubic = {
 
           if xhr.status >= 400
             error = JSON.parse(xhr.responseText)
+            if $onError
+              $onError(error)
             reject(error)
 }
 
+
+
+if global
+  global.Rubic = Rubic
+else if window
+  window.Rubic = Rubic
 
 
 

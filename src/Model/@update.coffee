@@ -2,11 +2,14 @@ module.exports = (model, query, modifier) ->
 
   {collection, schema} = model
 
-  query = @formatQuery(query)
+  query    = @formatQuery(query)
   modifier = @formatModifier(modifier)
+  opt      = {returnOriginal: false}
 
-  await @db
+  result = await @db
     .collection(collection)
-    .updateOne(query, modifier)
+    .findOneAndUpdate(query, modifier, opt)
 
-  return undefined
+  # @TODO 安全检查
+  doc = result.value
+  return doc

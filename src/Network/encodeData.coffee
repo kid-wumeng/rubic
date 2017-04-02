@@ -10,6 +10,7 @@ module.exports = (ctx) ->
     if !_.isPlainObject(data)
       throw "response-data should be a plain-object."
   else
+    ctx.response.status = 204
     return
 
   Helper.traverseLeaf data, (value, key, parent) ->

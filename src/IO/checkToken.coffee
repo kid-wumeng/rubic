@@ -2,12 +2,8 @@ module.exports = (ctx, define) ->
 
 
   if define.token
+
     token = ctx.request.token
-
-    if !token
-      throw "lack token
-             ( io-call-chain: -> #{ctx.rubicIOCallChain.join(' -> ')} )."
-
 
 
     { $type } = token
@@ -15,7 +11,6 @@ module.exports = (ctx, define) ->
     if define.token[$type] isnt true
       throw "token-type '#{$type}' can't call the io <#{define.name}>,
              ( io-call-chain: -> #{ctx.rubicIOCallChain.join(' -> ')} )."
-
 
 
     # 为防止调用期间过期，仅校验一次有效期

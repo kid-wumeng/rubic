@@ -6,7 +6,6 @@ module.exports = (defineDict) ->
 
   for name, define of defineDict
 
-
     if @isPublic(name)
       name = @formatName(name)
       define.isPublic = true
@@ -17,7 +16,8 @@ module.exports = (defineDict) ->
     define.name = name
 
 
-    define.iSchema = @formatSchema(define.iSchema)
+    if define.iSchema
+      define.iSchema = @formatSchema(define.iSchema)
 
 
     io = @wrap(define)
