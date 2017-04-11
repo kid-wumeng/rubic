@@ -1,10 +1,8 @@
 $host = null
-$onError = null
+$catch = null
 
 
-Rubic = {
-
-  host: (host) ->
+exports.host = (host) ->
     len = host.length
     last = host[len-1]
     if last isnt '/'
@@ -12,17 +10,17 @@ Rubic = {
     $host = host
 
 
-  onError: (onError) ->
-    $onError = onError
+exports.catch = (catchFn) ->
+    $catch = catchFn
 
 
-  fromDataURL: (dataUrl) ->
+exports.fromDataURL = (dataUrl) ->
     base64 = dataUrl.replace(/data:.*;base64,/, '')
     base64Wrapped = "\/Base64(#{base64})\/"
     return base64Wrapped
 
 
-  call: (name, data={}) ->
+exports.call = (name, data={}) ->
 
     forData data, (value, key, parent) ->
       # 编码日期
@@ -46,6 +44,7 @@ Rubic = {
     xhr.send(data)
 
     return new Promise (resolve, reject) ->
+
       xhr.onreadystatechange = () ->
         if xhr.readyState is XMLHttpRequest.DONE
 
@@ -70,17 +69,9 @@ Rubic = {
 
           if xhr.status >= 400
             error = JSON.parse(xhr.responseText)
-            if $onError
-              $onError(error)
             reject(error)
-}
-
-
-
-if global
-  global.Rubic = Rubic
-else if window
-  window.Rubic = Rubic
+            if $catch
+               $catch(error)
 
 
 

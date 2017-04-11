@@ -30,7 +30,7 @@ module.exports = (rule, datas, field, opt) ->
         if _.isPlainObject(doc)
           if _.isFinite(doc.id)
             ids.push(doc.id)
-            validDict["#{i}.#{j}"] = true
+            _.set(validDict, "#{i}.#{j}", true)
 
   # join's doc-ids
   ids = _.uniq(ids)
@@ -57,7 +57,6 @@ module.exports = (rule, datas, field, opt) ->
     if validDict[i]
       # join's docs
       docs = _.get(data, field)
-
       for doc, j in docs
         if validDict[i][j]
           docs[j] = dict[doc.id]

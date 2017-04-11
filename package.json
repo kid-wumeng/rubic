@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "scripts": {
     "test": "mocha -u tdd --compilers coffee:coffeescript/register --recursive --harmony",
-    "coffee": "./node_modules/coffee-script/bin/coffee -o lib -c src/Client/*.coffee",
+    "coffee": "./node_modules/coffee-script/bin/coffee -b -o lib -c src/Client/*.coffee",
     "uglify-web": "uglifyjs -c -m -o lib/web.min.js -- lib/web.js",
     "uglify-ns": "uglifyjs -c -m -o lib/native-script.min.js -- lib/native-script.js",
     "build": "npm run coffee && npm run uglify-web && npm run uglify-ns"

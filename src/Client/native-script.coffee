@@ -1,7 +1,8 @@
 $host = null
+$catch = null
 
 
-global.Rubic = {
+global.rubic = {
 
   host: (host) ->
     len = host.length
@@ -9,6 +10,10 @@ global.Rubic = {
     if last isnt '/'
       host += '/'
     $host = host
+
+
+  catch: (callback) ->
+    $catch = callback
 
 
   fromDataURL: (dataUrl) ->
@@ -59,6 +64,8 @@ global.Rubic = {
 
         else
           response.json().then (error) ->
+            if $catch
+              $catch(error)
             reject(error)
       )
 

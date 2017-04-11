@@ -19,8 +19,14 @@ module.exports = (ctx) ->
     if /^\/Date\(\d+\)\/$/.test(value)
       value = value.slice(6, value.length-2)
       timeStamp = parseInt(value)
-      parent[key] = new Date(timeStamp)
+      value = new Date(timeStamp)
 
-    if /^\/Base64\(.+\)\/$/.test(value)
+    else if /^\/Base64\(.+\)\/$/.test(value)
       base64 = value.slice(8, value.length-2)
-      parent[key] = new Buffer(base64, 'base64')
+      value = new Buffer(base64, 'base64')
+
+    # 比如： data = {'user.id': 6}
+    # 则删除 data['user.id']
+    # 替换为 data['user']['id']
+    delete parent[key]
+    _.set(parent, key, value)

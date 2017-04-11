@@ -19,7 +19,6 @@ module.exports = (node, data, opt) ->
     return value
 
 
-
   dataFiltered = {}
 
 
