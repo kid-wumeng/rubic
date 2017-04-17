@@ -4,7 +4,7 @@ IO = require('../IO')
 module.exports = (ctx) ->
 
   try
-    
+
     # '/shop.findBook' -> 'shop.findBook'
     name = ctx.path.slice(1)
 

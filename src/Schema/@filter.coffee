@@ -41,7 +41,7 @@ module.exports = (node, data, opt) ->
       childNode = childNode[0]
       childDataArray = _.get(data, key)
 
-      if childDataArray
+      if _.isArray(childDataArray)
         childDataArray = childDataArray.map (childData) =>
           return @filter(childNode, childData, opt)
 

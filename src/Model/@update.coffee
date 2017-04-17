@@ -1,3 +1,6 @@
+Schema = require('../Schema')
+
+
 module.exports = (model, query, modifier) ->
 
   {collection, schema} = model
@@ -5,6 +8,8 @@ module.exports = (model, query, modifier) ->
   query    = @formatQuery(query)
   modifier = @formatModifier(modifier)
   opt      = {returnOriginal: false}
+
+  modifier.$set = Schema.filter(schema, modifier.$set)
 
   result = await @db
     .collection(collection)

@@ -29,4 +29,5 @@ module.exports = (ctx) ->
     # 则删除 data['user.id']
     # 替换为 data['user']['id']
     delete parent[key]
+
     _.set(parent, key, value)
