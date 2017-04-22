@@ -9,8 +9,6 @@ module.exports = (model, query, modifier) ->
   modifier = @formatModifier(modifier)
   opt      = {returnOriginal: false}
 
-  modifier.$set = Schema.filter(schema, modifier.$set)
-
   result = await @db
     .collection(collection)
     .findOneAndUpdate(query, modifier, opt)
