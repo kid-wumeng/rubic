@@ -8,7 +8,9 @@ module.exports = (cfg) ->
   bluebird.promisifyAll(redis.RedisClient.prototype)
   bluebird.promisifyAll(redis.Multi.prototype)
 
-  rawClient = redis.createClient()
+  host = cfg.redis.host ? '127.0.0.1'
+
+  rawClient = redis.createClient({host})
 
   @client = {}
 
