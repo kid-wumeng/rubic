@@ -12,8 +12,8 @@ module.exports = ( model, query, opt ) ->
     .collection(collection)
     .findOne(query, opt)
 
-  if data
-    data = Schema.filter(schema, data)
+  # if data
+  #   data = Schema.filter(schema, data)
 
   if opt.join
     await @findOneJoin(schema, data, opt.join)
