@@ -13,9 +13,9 @@ module.exports = ( model, query, opt ) ->
     .find(query, opt)
     .toArray()
 
-  # if datas.length
-  #   datas = datas.map (data) ->
-  #     return Schema.filter(schema, data)
+  if datas.length
+    datas = datas.map (data) ->
+      return Schema.filter(schema, data)
 
   if opt.join
     await @findJoin(schema, datas, opt.join)
