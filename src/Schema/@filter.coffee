@@ -13,6 +13,13 @@ module.exports = (node, data, opt) ->
 
     value = Rule.parseValue(rule, value)
 
+
+    # @REVIEW
+    if opt.out
+      if !value
+        return undefined
+
+
     if opt.check
       Rule.checkValue(rule, value)
 

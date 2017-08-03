@@ -13,7 +13,7 @@ module.exports = ( model, query, opt ) ->
     .findOne(query, opt)
 
   if data
-    data = Schema.filter(schema, data)
+    data = Schema.filter(schema, data, {out: true})
 
   if opt.join
     await @findOneJoin(schema, data, opt.join)
